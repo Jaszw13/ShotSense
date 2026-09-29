@@ -1,0 +1,2356 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ShotSense · Shot Data Probe 2014–15</title>
+<style>/*__FONTS__*/</style>
+<style>
+/* ==========================================================================
+   SHOTSENSE — 90s Retro Card & Editorial Aesthetics
+   Design tokens are authoritative. No neon. No gradients. No blur. No
+   modern rounded corners. Tactile newsprint + solid offset ink shadows.
+   ========================================================================== */
+:root{
+  --canvas:#F4F1DE;   /* vintage cream / newsprint */
+  --surface:#FFFCEB;  /* light paper panel        */
+  --paper2:#FFFDF2;
+  --ink:#1D3557;      /* deep navy ink            */
+  --red:#E63946;      /* retro crimson            */
+  --gold:#E9C46A;     /* mustard gold             */
+  --teal:#2A9D8F;     /* vintage teal             */
+  --amber:#F4A261;    /* burnt orange             */
+  --grid:#E5E0D8;     /* soft vintage paper grid  */
+  --muted:#6B7A8F;
+  --serif:'Playfair Display',Georgia,'Times New Roman',serif;
+  --sans:'Inter','Helvetica Neue',Arial,sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;padding:0 0 104px;
+  background:var(--canvas);color:var(--ink);
+  font-family:var(--sans);font-size:14px;line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+}
+/* newsprint grain — texture only, deliberately not a gradient */
+body::before{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.5;
+  mix-blend-mode:multiply;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='160' height='160' filter='url(%23n)' opacity='0.16'/></svg>");
+}
+.wrap{position:relative;z-index:1;max-width:1500px;margin:0 auto;padding:26px 24px 0}
+
+/* ---------- typography ---------- */
+h1,h2,h3,h4{font-family:var(--serif);font-weight:900;letter-spacing:-.01em;margin:0}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums;font-feature-settings:"tnum" 1}
+.lab{font-family:var(--sans);font-size:10px;font-weight:700;letter-spacing:.18em;
+     text-transform:uppercase;color:var(--muted)}
+.lab-ink{color:var(--ink)}
+
+/* ---------- masthead ---------- */
+.masthead{
+  background:var(--surface);border:2px solid var(--ink);border-radius:4px;
+  box-shadow:6px 6px 0 var(--ink);
+  padding:24px 26px;margin-bottom:18px;
+  display:flex;gap:26px;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;
+}
+.masthead .kicker{font-family:var(--mono);font-size:10.5px;font-weight:700;
+  letter-spacing:.22em;text-transform:uppercase;color:var(--red);margin-bottom:8px}
+.masthead h1{font-size:clamp(30px,4.4vw,54px);line-height:.98;margin:0 0 8px}
+.masthead h1 em{font-style:italic;color:var(--red)}
+.masthead .dek{max-width:640px;font-size:13.5px;color:#3C4F6B;margin:0}
+.masthead .rule{height:3px;background:var(--ink);margin:14px 0 12px;border:0}
+.mast-right{display:flex;flex-direction:column;gap:10px;align-items:flex-end;min-width:300px}
+.stamprow{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.mastgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;width:100%}
+.mcell{border:2px solid var(--ink);border-radius:4px;background:var(--paper2);
+  padding:7px 10px;min-width:120px}
+.mcell .k{font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--muted)}
+.mcell .v{font-family:var(--mono);font-weight:700;font-size:18px;line-height:1.2;
+  font-variant-numeric:tabular-nums}
+
+/* ---------- stamps & badges ---------- */
+.stamp{
+  display:inline-block;border:1px dashed var(--ink);border-radius:2px;
+  background:var(--gold);color:var(--ink);
+  font-family:var(--mono);font-size:10px;font-weight:700;
+  letter-spacing:.14em;text-transform:uppercase;padding:4px 9px;white-space:nowrap;
+}
+.stamp.teal{background:var(--teal);color:var(--surface)}
+.stamp.red{background:var(--red);color:var(--surface)}
+.stamp.amber{background:var(--amber)}
+.stamp.plain{background:var(--paper2)}
+.stamp.ghost{background:transparent;border-style:dashed}
+
+/* ---------- buttons ---------- */
+.btn{
+  font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.1em;
+  text-transform:uppercase;padding:7px 13px;border:2px solid var(--ink);
+  border-radius:4px;background:var(--surface);color:var(--ink);
+  box-shadow:2px 2px 0 var(--ink);cursor:pointer;white-space:nowrap;
+}
+.btn:hover{transform:translate(-2px,-2px);box-shadow:4px 4px 0 var(--ink)}
+.btn:active{transform:translate(2px,2px);box-shadow:0 0 0 var(--ink)}
+.btn.primary{background:var(--red);color:var(--surface)}
+.btn.gold{background:var(--gold)}
+.btn.teal{background:var(--teal);color:var(--surface)}
+.btn.on{background:var(--ink);color:var(--surface)}
+.btn.sm{padding:4px 8px;font-size:10px;box-shadow:1px 1px 0 var(--ink)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn:disabled:hover{transform:none;box-shadow:2px 2px 0 var(--ink)}
+
+/* ---------- toolbar ---------- */
+.toolbar{
+  position:sticky;top:0;z-index:40;
+  background:var(--surface);border:2px solid var(--ink);border-radius:4px;
+  box-shadow:4px 4px 0 var(--ink);
+  padding:11px 14px;margin-bottom:16px;
+  display:flex;gap:14px;align-items:flex-end;flex-wrap:wrap;
+}
+.tfield{display:flex;flex-direction:column;gap:4px;min-width:0}
+.tfield .lab{font-size:9.5px}
+select,input[type=text]{
+  font-family:var(--mono);font-size:12px;font-weight:700;color:var(--ink);
+  background:var(--paper2);border:2px solid var(--ink);border-radius:4px;
+  padding:6px 9px;min-width:190px;max-width:100%;
+  box-shadow:2px 2px 0 var(--ink);
+}
+select:focus,input[type=text]:focus{outline:2px solid var(--red);outline-offset:1px}
+.tsep{width:2px;align-self:stretch;background:var(--ink);opacity:.22;margin:0 2px}
+.tspacer{flex:1 1 auto}
+.tswitch{display:flex;gap:6px;align-items:flex-end}
+
+/* ---------- accordion cards ---------- */
+.card{
+  background:var(--surface);border:2px solid var(--ink);border-radius:4px;
+  box-shadow:4px 4px 0 var(--ink);
+  margin-bottom:16px;overflow:hidden;scroll-margin-top:96px;
+}
+.card-head{
+  display:flex;align-items:center;gap:12px;
+  padding:12px 16px;cursor:pointer;user-select:none;
+  background:var(--paper2);border-bottom:2px solid transparent;
+}
+.card.open .card-head{border-bottom:2px solid var(--ink)}
+.card-head:hover{background:#FFF8D8}
+.card-no{
+  font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.1em;
+  background:var(--ink);color:var(--surface);border-radius:3px;padding:3px 7px;
+}
+.card-title{font-family:var(--serif);font-weight:900;font-size:19px;line-height:1.1}
+.card-en{font-family:var(--mono);font-size:9.5px;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--muted);margin-top:2px}
+.card-digest{flex:1 1 auto;min-width:0;font-family:var(--mono);font-size:11px;
+  color:#3C4F6B;text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.caret{font-family:var(--mono);font-size:15px;font-weight:700;color:var(--ink);
+  width:22px;text-align:center}
+.card-body{display:none;padding:16px}
+.card.open .card-body{display:block}
+
+/* ---------- panels & grids ---------- */
+.panel{border:2px solid var(--ink);border-radius:4px;background:var(--paper2);
+  padding:12px;margin-bottom:12px}
+.panel-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+.panel-head h3{font-size:15px}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.grid4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.grid6{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px}
+@media(max-width:1100px){.grid6{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .grid4{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:820px){.grid2,.grid3,.grid4,.grid6{grid-template-columns:1fr}}
+
+/* ---------- stat cards ---------- */
+.stat{border:2px solid var(--ink);border-radius:4px;background:var(--surface);
+  padding:10px 12px;box-shadow:2px 2px 0 var(--ink);position:relative}
+.stat .k{font-family:var(--mono);font-size:9.5px;font-weight:700;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--muted)}
+.stat .v{font-family:var(--mono);font-weight:700;font-size:23px;line-height:1.18;
+  font-variant-numeric:tabular-nums;word-break:break-word}
+.stat .n{font-family:var(--mono);font-size:10px;color:#3C4F6B;margin-top:2px}
+.stat.hi{background:var(--gold)}
+.stat.ok{background:#D9EFE9}
+.stat.warn{background:#FBE0C8}
+.stat.bad{background:#F8D7DA}
+.stat.ink{background:var(--ink)}
+.stat.ink .k,.stat.ink .n{color:#C9D6E8}
+.stat.ink .v{color:var(--surface)}
+
+/* ---------- charts ---------- */
+.chart{width:100%;height:400px}
+.chart.tall{height:520px}
+.chart.short{height:300px}
+.chart.xl{height:820px}
+.note{font-family:var(--mono);font-size:10.5px;line-height:1.7;color:#3C4F6B;
+  border-left:3px solid var(--gold);padding:6px 0 6px 10px;margin-top:10px}
+.note b{color:var(--ink)}
+.note.red{border-left-color:var(--red)}
+.note.teal{border-left-color:var(--teal)}
+.note.gold{border-left-color:var(--gold)}
+
+/* ---------- table ---------- */
+.tblwrap{max-height:560px;overflow:auto;border:2px solid var(--ink);border-radius:4px}
+table.tbl{border-collapse:collapse;width:100%;font-family:var(--mono);font-size:11.5px;
+  font-variant-numeric:tabular-nums}
+table.tbl thead th{
+  position:sticky;top:0;z-index:2;background:var(--ink);color:var(--surface);
+  font-family:var(--sans);font-size:9.5px;font-weight:700;letter-spacing:.14em;
+  text-transform:uppercase;text-align:left;padding:8px 9px;white-space:nowrap;
+  border-right:1px solid #3A5578;cursor:pointer;
+}
+table.tbl tbody td{padding:6px 9px;border-bottom:1px solid var(--grid);
+  border-right:1px solid var(--grid);white-space:nowrap}
+table.tbl tbody tr:nth-child(even){background:#FBF8E4}
+table.tbl tbody tr:hover{background:var(--gold)}
+table.tbl tbody tr.selA{background:#FAD9DC;box-shadow:inset 3px 0 0 var(--red)}
+table.tbl tbody tr.selB{background:#D9EFE9;box-shadow:inset 3px 0 0 var(--teal)}
+table.tbl tbody tr.selA.selB{background:#F6E7C0;box-shadow:inset 3px 0 0 var(--red),inset 6px 0 0 var(--teal)}
+table.tbl tbody tr{cursor:pointer}
+.tbl .num{text-align:right}
+.tag{display:inline-block;font-family:var(--mono);font-size:9px;font-weight:700;
+  letter-spacing:.1em;text-transform:uppercase;padding:1px 5px;border:1px solid var(--ink);
+  border-radius:2px;background:var(--paper2)}
+.tag.cat{background:var(--teal);color:var(--surface)}
+.tag.num{background:var(--gold)}
+.tag.matchup{background:var(--amber)}
+
+/* ---------- misc ---------- */
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.06em;
+  border:2px solid var(--ink);border-radius:4px;background:var(--paper2);
+  padding:3px 8px;cursor:pointer;box-shadow:1px 1px 0 var(--ink)}
+.chip:hover{transform:translate(-1px,-1px);box-shadow:2px 2px 0 var(--ink)}
+.chip.on{background:var(--ink);color:var(--surface)}
+.hr{height:2px;background:var(--ink);opacity:.18;margin:14px 0;border:0}
+.kv{display:flex;justify-content:space-between;gap:10px;font-family:var(--mono);
+  font-size:11px;padding:3px 0;border-bottom:1px dotted #CFC9B4}
+.kv .k{color:var(--muted)}
+.kv .v{font-weight:700}
+.meter{display:flex;gap:3px;margin-top:6px}
+.meter i{flex:1;height:12px;border:2px solid var(--ink);border-radius:2px;background:var(--paper2)}
+.meter i.f{background:var(--red)}
+.meter i.g{background:var(--gold)}
+.meter i.t{background:var(--teal)}
+
+/* ---------- language bar (fixed bottom) ---------- */
+.langbar{position:fixed;left:0;right:0;bottom:0;z-index:60;display:flex;
+  justify-content:center;padding:10px 12px;pointer-events:none}
+.langcard{pointer-events:auto;background:var(--surface);border:2px solid var(--ink);
+  border-radius:4px;box-shadow:4px 4px 0 var(--ink);
+  padding:7px 12px;display:flex;align-items:center;gap:10px}
+.langcard .langlab{font-family:var(--mono);font-size:9.5px;font-weight:700;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+.langbtn{font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.1em;
+  border:2px solid var(--ink);border-radius:4px;background:var(--surface);
+  color:var(--ink);padding:5px 12px;cursor:pointer;box-shadow:2px 2px 0 var(--ink)}
+.langbtn:hover{transform:translate(-2px,-2px);box-shadow:4px 4px 0 var(--ink)}
+.langbtn.on{background:var(--red);color:var(--surface)}
+.langbtn.on:hover{transform:none;box-shadow:2px 2px 0 var(--ink)}
+
+/* ---------- boot overlay ---------- */
+#boot{position:fixed;inset:0;z-index:200;background:var(--canvas);
+  display:flex;align-items:center;justify-content:center;padding:24px}
+#bootCard{width:min(680px,94vw);background:var(--surface);border:2px solid var(--ink);
+  border-radius:4px;box-shadow:6px 6px 0 var(--ink);padding:26px}
+#bootCard h2{font-size:26px;margin-bottom:4px}
+#bootLog{margin-top:14px;font-family:var(--mono);font-size:11px;line-height:1.85;
+  color:#3C4F6B;max-height:230px;overflow:auto}
+#bootLog div::before{content:'> ';color:var(--red)}
+#bootBar{height:16px;border:2px solid var(--ink);border-radius:3px;margin-top:14px;
+  background:var(--paper2);overflow:hidden}
+#bootFill{height:100%;width:0%;background:var(--red);border-right:2px solid var(--ink);
+  transition:width .18s linear}
+#bootPct{font-family:var(--mono);font-size:10px;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--muted);margin-top:6px}
+
+.footer{max-width:1500px;margin:22px auto 0;padding:0 24px;
+  font-family:var(--mono);font-size:10px;letter-spacing:.08em;color:var(--muted);
+  display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap}
+::-webkit-scrollbar{width:11px;height:11px}
+::-webkit-scrollbar-track{background:var(--paper2);border-left:2px solid var(--ink)}
+::-webkit-scrollbar-thumb{background:var(--ink);border:2px solid var(--paper2)}
+</style>
+</head>
+<body>
+
+<!-- ============================ BOOT ============================ -->
+<div id="boot">
+  <div id="bootCard">
+    <div class="stamp red">[SYSTEM / INITIALISING]</div>
+    <h2 style="margin-top:12px">ShotSense Data Probe</h2>
+    <div class="lab">2014–15 NBA · 58 model parameters · full dataset, no sampling</div>
+    <div id="bootBar"><div id="bootFill"></div></div>
+    <div id="bootPct">0%</div>
+    <div id="bootLog"></div>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <!-- ============================ MASTHEAD ============================ -->
+  <header class="masthead">
+    <div class="mast-left">
+      <div class="kicker" data-i18n="kicker"></div>
+      <h1>Shot&nbsp;Data <em>Probe</em></h1>
+      <hr class="rule">
+      <p class="dek" data-i18n="mast_dek"></p>
+    </div>
+    <div class="mast-right">
+      <div class="stamprow">
+        <span class="stamp red" data-i18n="stamp_edition"></span>
+        <span class="stamp teal" data-i18n="stamp_offline"></span>
+        <span class="stamp plain" data-i18n="stamp_nosample"></span>
+      </div>
+      <div class="mastgrid">
+        <div class="mcell"><div class="k" data-i18n="m_shots"></div><div class="v mono" id="mShots">—</div></div>
+        <div class="mcell"><div class="k" data-i18n="m_players"></div><div class="v mono" id="mPlayers">—</div></div>
+        <div class="mcell"><div class="k" data-i18n="m_params"></div><div class="v mono" id="mParams">—</div></div>
+        <div class="mcell"><div class="k" data-i18n="m_fg"></div><div class="v mono" id="mFg">—</div></div>
+        <div class="mcell"><div class="k" data-i18n="m_span"></div><div class="v mono" id="mSpan" style="font-size:15px">—</div></div>
+        <div class="mcell"><div class="k" data-i18n="m_payload"></div><div class="v mono" id="mPayload" style="font-size:15px">—</div></div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ============================ TOOLBAR ============================ -->
+  <div class="toolbar" id="toolbar">
+    <div class="tfield">
+      <span class="lab" data-i18n="t_alpha"></span>
+      <select id="selA"></select>
+    </div>
+    <div class="tfield">
+      <span class="lab" data-i18n="t_beta"></span>
+      <select id="selB"></select>
+    </div>
+    <button class="btn sm" id="btnSwap" data-i18n="t_swap"></button>
+    <button class="btn sm gold" id="btnSame" data-i18n="t_selfpair"></button>
+    <div class="tsep"></div>
+    <div class="tswitch">
+      <button class="btn sm" id="btnExpand" data-i18n="t_expand"></button>
+      <button class="btn sm" id="btnCollapse" data-i18n="t_collapse"></button>
+    </div>
+    <div class="tspacer"></div>
+    <div class="tfield" style="min-width:0">
+      <span class="lab" data-i18n="t_group"></span>
+      <div class="chips" id="groupChips"></div>
+    </div>
+  </div>
+
+  <!-- ============================ 00 SELECT ============================ -->
+  <section class="card open" id="s-select">
+    <div class="card-head" data-toggle="s-select">
+      <span class="card-no">00</span>
+      <div><div class="card-title" data-i18n="sec_select"></div>
+           <div class="card-en">PARAMETER SELECT</div></div>
+      <div class="card-digest" id="dgSelect"></div>
+      <span class="caret">−</span>
+    </div>
+    <div class="card-body">
+      <div class="grid2">
+        <div class="panel">
+          <div class="panel-head">
+            <span class="stamp red">[α / PRIMARY]</span>
+            <h3 id="tA"></h3>
+          </div>
+          <div id="infoA"></div>
+        </div>
+        <div class="panel">
+          <div class="panel-head">
+            <span class="stamp teal">[β / SECONDARY]</span>
+            <h3 id="tB"></h3>
+          </div>
+          <div id="infoB"></div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-head">
+          <span class="stamp">[QUICK PICK]</span>
+          <h3 data-i18n="qp_title"></h3>
+          <span class="lab" data-i18n="qp_hint"></span>
+        </div>
+        <div class="chips" id="quickA"></div>
+        <div class="hr"></div>
+        <div class="chips" id="quickB"></div>
+      </div>
+      <div class="note" data-i18n="sel_note"></div>
+    </div>
+  </section>
+
+  <!-- ============================ 01 PROFILE ============================ -->
+  <section class="card open" id="s-profile">
+    <div class="card-head" data-toggle="s-profile">
+      <span class="card-no">01</span>
+      <div><div class="card-title" data-i18n="sec_profile"></div>
+           <div class="card-en">STATISTICAL PROFILE</div></div>
+      <div class="card-digest" id="dgProfile"></div>
+      <span class="caret">−</span>
+    </div>
+    <div class="card-body">
+      <div class="panel-head">
+        <span class="stamp">[SPEC. NO. 01 / OFFICIAL]</span>
+        <h3 data-i18n="prof_title"></h3>
+      </div>
+      <div class="grid6" id="statCards"></div>
+      <div id="statNote"></div>
+    </div>
+  </section>
+
+  <!-- ============================ 02 DIST ============================ -->
+  <section class="card" id="s-dist">
+    <div class="card-head" data-toggle="s-dist">
+      <span class="card-no">02</span>
+      <div><div class="card-title" data-i18n="sec_dist"></div>
+           <div class="card-en">DISTRIBUTION</div></div>
+      <div class="card-digest" id="dgDist"></div>
+      <span class="caret">+</span>
+    </div>
+    <div class="card-body">
+      <div class="panel">
+        <div class="panel-head">
+          <span class="stamp">[FREQUENCY / DENSITY]</span>
+          <h3 id="distTitle"></h3>
+          <button class="btn sm" id="btnKde" data-i18n="btn_kde"></button>
+          <button class="btn sm" id="btnLogY" data-i18n="btn_logy"></button>
+          <span class="lab" id="distSub"></span>
+        </div>
+        <div class="chart tall" id="cDist"></div>
+        <div class="note" id="distNote"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================ 03 QQ ============================ -->
+  <section class="card" id="s-qq">
+    <div class="card-head" data-toggle="s-qq">
+      <span class="card-no">03</span>
+      <div><div class="card-title" data-i18n="sec_qq"></div>
+           <div class="card-en">NORMALITY / Q-Q</div></div>
+      <div class="card-digest" id="dgQq"></div>
+      <span class="caret">+</span>
+    </div>
+    <div class="card-body">
+      <div class="panel">
+        <div class="panel-head">
+          <span class="stamp">[Q-Q PLOT / NORMAL REF.]</span>
+          <h3 id="qqTitle"></h3>
+          <span class="lab" id="qqSub"></span>
+        </div>
+        <div class="grid4" id="qqCards"></div>
+        <div class="chart tall" id="cQq"></div>
+        <div class="note" id="qqNote"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================ 04 OUTLIER ============================ -->
+  <section class="card" id="s-outlier">
+    <div class="card-head" data-toggle="s-outlier">
+      <span class="card-no">04</span>
+      <div><div class="card-title" data-i18n="sec_out"></div>
+           <div class="card-en">OUTLIERS / BOX</div></div>
+      <div class="card-digest" id="dgOut"></div>
+      <span class="caret">+</span>
+    </div>
+    <div class="card-body">
+      <div class="panel">
+        <div class="panel-head">
+          <span class="stamp">[BOX PLOT / 1.5×IQR FENCE]</span>
+          <h3 id="boxTitle"></h3>
+          <span class="lab" id="boxSub"></span>
+        </div>
+        <div class="grid4" id="boxCards"></div>
+        <div class="chart short" id="cBox"></div>
+        <div class="note" id="boxNote"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================ 05 PAIR ============================ -->
+  <section class="card" id="s-pair">
+    <div class="card-head" data-toggle="s-pair">
+      <span class="card-no">05</span>
+      <div><div class="card-title" data-i18n="sec_pair"></div>
+           <div class="card-en">BIVARIATE</div></div>
+      <div class="card-digest" id="dgPair"></div>
+      <span class="caret">+</span>
+    </div>
+    <div class="card-body">
+      <div class="panel">
+        <div class="panel-head">
+          <span class="stamp teal">[α × β SCATTER]</span>
+          <h3 id="pairTitle"></h3>
+          <button class="btn sm" id="btnTrend" data-i18n="btn_trend"></button>
+          <span class="lab" id="pairSub"></span>
+        </div>
+        <div class="chart tall" id="cPair"></div>
+        <div class="note" id="pairNote"></div>
+      </div>
+      <div class="panel">
+        <div class="panel-head">
+          <span class="stamp plain">[CLICK INSPECTOR]</span>
+          <h3 data-i18n="probe_title"></h3>
+        </div>
+        <div id="probeDetail" class="note" data-i18n="probe_empty"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================ 06 RELATION ============================ -->
+  <section class="card" id="s-rel">
+    <div class="card-head" data-toggle="s-rel">
+      <span class="card-no">06</span>
+      <div><div class="card-title" data-i18n="sec_rel"></div>
+           <div class="card-en">ASSOCIATION</div></div>
+      <div class="card-digest" id="dgRel"></div>
+      <span class="caret">+</span>
+    </div>
+    <div class="card-body">
+      <div class="grid3">
+        <div class="panel">
+          <div class="panel-head"><span class="stamp red">[MEASURE]</span></div>
+          <div class="stat ink"><div class="k" data-i18n="rel_measure"></div>
+            <div class="v" id="relName">—</div>
+            <div class="n" id="relWhy"></div></div>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><span class="stamp gold">[STRENGTH]</span></div>
+          <div class="stat hi"><div class="k" data-i18n="rel_value"></div>
+            <div class="v mono" id="relVal">—</div>
+            <div class="n" id="relLabel"></div>
+            <div class="meter" id="relMeter"><i></i><i></i><i></i><i></i><i></i></div></div>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><span class="stamp teal">[DIRECTION]</span></div>
+          <div class="stat ok"><div class="k" data-i18n="rel_dir"></div>
+            <div class="v" id="relDir">—</div>
+            <div class="n" id="relDirNote"></div></div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><span class="stamp plain">[READOUT]</span>
+          <h3 data-i18n="rel_readout"></h3></div>
+        <div id="relBody" class="note" style="border-left-color:var(--ink)"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================ 07 MATRIX ============================ -->
+  <section class="card" id="s-matrix">
+    <div class="card-head" data-toggle="s-matrix">
+      <span class="card-no">07</span>
+      <div><div class="card-title" data-i18n="sec_matrix"></div>
+           <div class="card-en">CORRELATION MATRIX</div></div>
+      <div class="card-digest" id="dgMatrix"></div>
+      <span class="caret">+</span>
+    </div>
+    <div class="card-body">
+      <div class="panel">
+        <div class="panel-head">
+          <span class="stamp red">[58 × 58 / FULL DATA]</span>
+          <h3 data-i18n="mx_title"></h3>
+          <button class="btn sm on" id="mxAssoc" data-i18n="mx_assoc"></button>
+          <button class="btn sm" id="mxSpear" data-i18n="mx_spear"></button>
+          <span class="lab" id="mxSub"></span>
+        </div>
+        <div class="chart xl" id="cHeat"></div>
+        <div class="note" id="mxNote"></div>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><span class="stamp gold">[TOP LINKS]</span>
+          <h3 data-i18n="mx_top"></h3></div>
+        <div class="tblwrap" style="max-height:340px">
+          <table class="tbl" id="topPairs">
+            <colgroup>
+              <col style="width:110px"><col><col><col style="width:130px"><col style="width:96px">
+            </colgroup>
+            <tbody></tbody>
+          </table>
+        </div>
+        <div class="note" id="topNote"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================ 08 QUALITY ============================ -->
+  <section class="card" id="s-quality">
+    <div class="card-head" data-toggle="s-quality">
+      <span class="card-no">08</span>
+      <div><div class="card-title" data-i18n="sec_quality"></div>
+           <div class="card-en">MISSINGNESS</div></div>
+      <div class="card-digest" id="dgQuality"></div>
+      <span class="caret">+</span>
+    </div>
+    <div class="card-body">
+      <div class="panel">
+        <div class="panel-head">
+          <span class="stamp amber">[MISSING VALUE MAP]</span>
+          <h3 data-i18n="q_title"></h3>
+          <span class="lab" id="missSub"></span>
+        </div>
+        <div class="chart tall" id="cMiss"></div>
+        <div class="note" id="missNote"></div>
+      </div>
+      <div class="grid4" id="qCards"></div>
+    </div>
+  </section>
+
+  <!-- ============================ 09 LEDGER ============================ -->
+  <section class="card" id="s-ledger">
+    <div class="card-head" data-toggle="s-ledger">
+      <span class="card-no">09</span>
+      <div><div class="card-title" data-i18n="sec_ledger"></div>
+           <div class="card-en">PARAMETER LEDGER</div></div>
+      <div class="card-digest" id="dgLedger"></div>
+      <span class="caret">+</span>
+    </div>
+    <div class="card-body">
+      <div class="panel">
+        <div class="panel-head">
+          <span class="stamp">[REGISTER / 58 ROWS]</span>
+          <h3 data-i18n="led_title"></h3>
+          <input type="text" id="ledSearch" data-i18n-ph="led_search" style="min-width:220px">
+          <span class="lab" id="ledgerSub"></span>
+        </div>
+        <div class="tblwrap">
+          <table class="tbl" id="ledgerTbl">
+            <thead><tr>
+              <th data-i18n="th_rank"></th>
+              <th data-i18n="th_name"></th>
+              <th data-i18n="th_group"></th>
+              <th data-i18n="th_kind"></th>
+              <th class="num" data-i18n="th_shap"></th>
+              <th class="num" data-i18n="th_center"></th>
+              <th class="num" data-i18n="th_spread"></th>
+              <th class="num" data-i18n="th_miss"></th>
+              <th data-i18n="th_pick"></th>
+            </tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <div class="note" id="ledNote"></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="footer">
+    <span id="footLeft"></span>
+    <span id="footRight"></span>
+  </div>
+</div>
+
+<!-- ============================ LANGUAGE BAR ============================ -->
+<div class="langbar">
+  <div class="langcard">
+    <span class="langlab" data-i18n="lang_label"></span>
+    <button class="langbtn" data-lang="zh">中文</button>
+    <button class="langbtn" data-lang="en">ENGLISH</button>
+  </div>
+</div>
+
+<script>/*__ECHARTS__*/</script>
+<script>/*__FFLATE__*/</script>
+<script>
+/* ==========================================================================
+   ShotSense Data Probe — runtime
+   ========================================================================== */
+'use strict';
+
+var META = /*__PROBE_META__*/;
+var PAYLOAD = '__PROBE_PAYLOAD__';
+
+/* ---------- design tokens (mirrored into JS) ---------- */
+var INK='#1D3557', RED='#E63946', GOLD='#E9C46A', TEAL='#2A9D8F', AMBER='#F4A261';
+var PAPER='#FFFCEB', PAPER2='#FFFDF2', GRID='#E5E0D8', MUTED='#6B7A8F';
+var F_SERIF="'Playfair Display',Georgia,serif";
+var F_MONO="'JetBrains Mono',ui-monospace,Menlo,monospace";
+var F_SANS="'Inter',Helvetica,Arial,sans-serif";
+
+/* ==========================================================================
+   1. i18n dictionary
+   ========================================================================== */
+var DICT = {
+  zh:{
+    lang_label:'語言 / LANGUAGE',
+    kicker:'SHOTSENSE · 畢業專題 · 2014–15 NBA 出手資料集',
+    mast_dek:'把 58 個模型參數全部塞進一個離線網頁。整份 102,992 筆資料即時解壓、即時判定型別、即時計算統計量——沒有抽樣、沒有後端。往下滑，把每一張卡打開，逐層看清資料的分佈、偏態、離群與變數之間的關係。',
+    stamp_edition:'[EDITION 2014–15 / V4 MATCHUP]',
+    stamp_offline:'[OFFLINE / SINGLE FILE]',
+    stamp_nosample:'[NO SAMPLING / FULL N]',
+    m_shots:'出手數', m_players:'球員數', m_params:'參數數', m_fg:'整體命中率',
+    m_span:'賽季區間', m_payload:'內嵌資料量',
+    t_alpha:'α 主要參數', t_beta:'β 對照參數', t_swap:'α ↔ β 對調',
+    t_selfpair:'β 跟隨 α', t_expand:'全部展開', t_collapse:'全部收合', t_group:'分組篩選',
+    sec_select:'參數選擇', sec_profile:'統計摘要', sec_dist:'分佈形態',
+    sec_qq:'常態性檢定', sec_out:'離群值檢視', sec_pair:'雙變數關係',
+    sec_rel:'關聯強度', sec_matrix:'相關矩陣', sec_quality:'缺失值分佈',
+    sec_ledger:'參數總表',
+    qp_title:'常用參數快速選取',
+    qp_hint:'點一下即切換，不用拉選單',
+    sel_note:'<b>怎麼讀：</b>α 是主要檢視對象，01–04 號卡片都跟著 α 走；β 只在 05、06 號卡片（雙變數與關聯強度）出現。所有圖表都可以滾輪縮放、拖曳平移；把滑鼠移到資料點上會顯示數值，在散佈圖上點一下會列出該筆出手的球員與完整數值。',
+    prof_title:'α 參數的統計側寫',
+    dist_title:'α 的分佈',
+    qq_title:'α 的 Q-Q 圖',
+    box_title:'α 的盒鬚圖',
+    pair_title:'α × β 的散佈圖',
+    probe_title:'點位檢視器',
+    probe_empty:'在 05 號卡片的散佈圖上點任一個資料點，這裡會顯示該筆出手的球員、日期與所有數值。',
+    rel_measure:'採用指標', rel_value:'關聯值', rel_dir:'方向', rel_readout:'判讀',
+    mx_title:'58 個參數的關聯矩陣',
+    mx_assoc:'關聯強度（混合型別）', mx_spear:'Spearman ρ',
+    mx_top:'最強的參數配對',
+    q_title:'各參數缺失比例',
+    led_title:'58 個參數完整清單',
+    led_search:'搜尋參數名稱…',
+    th_rank:'排序', th_name:'參數名稱', th_group:'分組', th_kind:'型別',
+    th_shap:'SHAP', th_center:'中心', th_spread:'離散', th_miss:'缺失',
+    th_pick:'選取',
+    btn_kde:'密度曲線', btn_logy:'對數刻度', btn_trend:'趨勢線',
+    on:'開', off:'關',
+    k_mean:'平均數', k_median:'中位數', k_std:'標準差', k_skew:'偏態',
+    k_kurt:'峰度（超額）', k_miss:'缺失比例', k_norm:'常態性', k_n:'有效筆數',
+    k_min:'最小值', k_max:'最大值', k_range:'全距', k_iqr:'四分位距',
+    k_cv:'變異係數', k_zero:'零值比例',
+    k_ncat:'類別數', k_top:'最大類別', k_topshare:'最大類別佔比',
+    k_imbal:'不平衡比', k_entropy:'熵', k_mode:'眾數',
+    k_out:'離群點數', k_outpct:'離群比例', k_fence:'圍籬區間',
+    v_num:'連續型', v_cat:'類別型', v_const:'常數',
+    v_norm:'近似常態', v_nonnorm:'非常態', v_heavy:'重尾', v_light:'輕尾',
+    v_right:'右偏', v_left:'左偏', v_sym:'大致對稱',
+    yes:'是', no:'否',
+    lbl_valid:'有效', lbl_cat:'類別', lbl_bins:'分箱', lbl_p95:'P95 裁切',
+    lbl_points:'繪製點數', lbl_of_total:'共 %s 筆',
+    jb_line:function(jb,p){return 'Jarque–Bera 統計量 JB = '+jb+'，p = '+p;},
+    jb_reject:function(p,n){return '在 n = '+n+' 下，常態性檢定'+(p<0.05?'<b>拒絕</b>常態假設':'<b>無法拒絕</b>常態假設')+'（α = 0.05）。';},
+    jb_note:'n 越大，Jarque–Bera 越敏感；實務上請一併看偏態與峰度的絕對值。',
+    skew_note:function(g1){return '偏態 G1 = '+g1+'，'+(g1>0.5?'右尾較長（右偏）':(g1<-0.5?'左尾較長（左偏）':'大致對稱'));},
+    kurt_note:function(g2){return '超額峰度 G2 = '+g2+'，'+(g2>1?'比常態更尖、尾更重':(g2<-1?'比常態更平坦':'接近常態的尾部厚度'));},
+    cat_note:function(top,share,imbal){return '類別型參數。最大類別 <b>'+top+'</b> 佔 <b>'+share+'</b>，最大／最小類別不平衡比 <b>'+imbal+'</b>。';},
+    dist_sub:function(a,b){return '有效 '+a+' 筆 / '+b+' 箱';},
+    box_fence:function(a,b){return '1.5×IQR 圍籬 ['+a+', '+b+']';},
+    qq_ref:'常態參考線 μ + σz',
+    qq_sub:function(s){return '抽樣 '+s+' 個順序統計量';},
+    qq_note:'點越貼著紅線，越接近常態。兩端明顯往上鉤＝右尾重；往下垂＝左尾重。中間的 S 形代表偏態，兩端同時外擴代表峰度過高。',
+    box_sub:function(w1,w2){return '圍籬 ['+w1+', '+w2+']';},
+    box_note:function(n,pct){return '以 1.5×IQR 為圍籬，<b>'+n+'</b> 筆被判為離群點，佔有效資料 <b>'+pct+'</b>。紅色點是離群點，已做垂直抖動以避免重疊。'},
+    pair_sub:function(a,b){return a+' × '+b;},
+    pair_note_num:'實心紅點是全部（或抽樣後的）資料點；深藍折線是沿 X 分箱後的中位數趨勢，用來看出單調性或非線性的形狀。',
+    pair_note_catnum:'每個類別是一條垂直的抖動帶；金色方塊是該類別的<b>中位數</b>，深藍折線把中位數串起來，方便比較組間差異。',
+    pair_note_catcat:'兩軸皆為類別型，改用列聯表熱圖呈現：顏色越深代表該組合出現的次數越多。',
+    probe_done:function(p){return '<b>球員：'+p+'</b>';},
+    rel_why_num:'兩者皆為連續型 → 使用 Spearman 等級相關 ρ（對離群值與單調非線性較穩健）。',
+    rel_why_catnum:'一邊類別、一邊連續 → 使用相關比 η（類別能解釋多少數值變異）。',
+    rel_why_catcat:'兩者皆為類別 → 使用偏差修正的 Cramér’s V（列聯表關聯強度）。',
+    rel_why_self:'α 與 β 相同，關聯值定義為 1。',
+    rel_dir_pos:'正相關', rel_dir_neg:'負相關', rel_dir_none:'無明顯方向',
+    rel_dir_note:'方向僅對連續型配對（Spearman ρ）有正負意義；η 與 Cramér’s V 恆為非負。',
+    s_none:'幾乎無關', s_weak:'微弱', s_mod:'中等', s_strong:'強', s_vstrong:'非常強',
+    mx_note:'這張矩陣用<b>單一一致</b>的指標：連續×連續 = |Spearman ρ|；類別×連續 = η；類別×類別 = Cramér’s V。全部以 102,992 筆全量計算。點任一格會把該配對設成 α / β 並跳回上方。',
+    mx_sub:function(n){return n+' × '+n+' 格 / 全量計算';},
+    mx_top_note:'列出矩陣中關聯最強、且不是自己跟自己比的前 20 組配對。接近 1.000 的配對通常是<b>同一件事的兩種編碼</b>（例如 shot_clock 與 shot_clock_filled、loc_y 與 dist_to_baseline），代表欄位之間有冗餘，建模時值得留意。點任一列可把該配對設成 α / β。',
+    q_sub:function(n,hi){return '有缺失的欄位 '+n+' 個 / 最高 '+hi;},
+    q_note:'資料來源是已經過特徵工程的模型輸入表，因此缺失主要集中在需要歷史視窗的滾動特徵（賽季初幾場還沒有足夠樣本）。這些缺失在建模時是以 NaN 交給 XGBoost 原生處理的。',
+    led_sub:function(n){return '顯示 '+n+' 列';},
+    led_note:'點任一列＝設為 α；按住 Shift 點＝設為 β。表格可用表頭排序，也可以在上面搜尋。',
+    ledger_done:function(n,p){return '已載入 '+n+' 個參數，共 '+p+' 個有效資料點。';},
+    sc_sample:function(s,n){return '抽樣 '+s+' 點 / 共 '+n+' 點';},
+    foot:function(n,d0,d1){return 'SHOTSENSE · DATA PROBE · '+n+' 筆出手 · '+d0+' → '+d1;},
+    foot2:'所有統計量皆在瀏覽器端即時計算；相關係數矩陣在 Python 端以全量資料精確計算後內嵌。',
+    boot_lines:['初始化 ShotSense Data Probe…','解壓內嵌資料集…','解析 58 個參數欄位…','自動判定連續型 / 類別型…','處理缺失值與有效樣本…','計算描述統計量（線上動差法）…','載入相關係數矩陣…','建構圖表與互動介面…','完成。'],
+    boot_ok:'就緒', boot_fail:'載入失敗',
+    err_fail:'載入失敗，請開啟瀏覽器主控台查看詳情。',
+    more:'其餘 %s 個未展開',
+    sel_a:'α = %s', sel_b:'β = %s'
+  },
+  en:{
+    lang_label:'LANGUAGE / 語言',
+    kicker:'SHOTSENSE · FINAL YEAR PROJECT · 2014–15 NBA SHOT DATASET',
+    mast_dek:'Fifty-eight model parameters, one offline page. All 102,992 rows are decompressed, type-inferred and summarised live in your browser — no sampling, no backend. Scroll down and open the cards one at a time to read the shape, skew, outliers and relationships of the data.',
+    stamp_edition:'[EDITION 2014–15 / V4 MATCHUP]',
+    stamp_offline:'[OFFLINE / SINGLE FILE]',
+    stamp_nosample:'[NO SAMPLING / FULL N]',
+    m_shots:'SHOTS', m_players:'PLAYERS', m_params:'PARAMETERS', m_fg:'OVERALL FG%',
+    m_span:'SEASON SPAN', m_payload:'EMBEDDED PAYLOAD',
+    t_alpha:'α PRIMARY', t_beta:'β SECONDARY', t_swap:'SWAP α ↔ β',
+    t_selfpair:'β FOLLOWS α', t_expand:'EXPAND ALL', t_collapse:'COLLAPSE ALL', t_group:'GROUP FILTER',
+    sec_select:'Parameter Select', sec_profile:'Statistical Profile', sec_dist:'Distribution',
+    sec_qq:'Normality / Q-Q', sec_out:'Outliers', sec_pair:'Bivariate',
+    sec_rel:'Association', sec_matrix:'Correlation Matrix', sec_quality:'Missingness',
+    sec_ledger:'Parameter Ledger',
+    qp_title:'Quick picks',
+    qp_hint:'One click to switch — no dropdown needed',
+    sel_note:'<b>How to read this:</b> α is the subject; cards 01–04 follow α. β only appears in cards 05 and 06. Every chart supports wheel-zoom and drag-pan. Hover a point to read its value; click a point in the scatter to list the player and the full record behind that shot.',
+    prof_title:'Statistical profile of α',
+    dist_title:'Distribution of α',
+    qq_title:'Q-Q plot of α',
+    box_title:'Box plot of α',
+    pair_title:'Scatter of α × β',
+    probe_title:'Point inspector',
+    probe_empty:'Click any point in the card-05 scatter and the player, date and every value behind that shot will appear here.',
+    rel_measure:'MEASURE', rel_value:'VALUE', rel_dir:'DIRECTION', rel_readout:'READOUT',
+    mx_title:'Association matrix across 58 parameters',
+    mx_assoc:'Association (mixed types)', mx_spear:'Spearman ρ',
+    mx_top:'Strongest parameter pairs',
+    q_title:'Missing-value rate per parameter',
+    led_title:'Full register of 58 parameters',
+    led_search:'Search parameter name…',
+    th_rank:'RANK', th_name:'PARAMETER', th_group:'GROUP', th_kind:'TYPE',
+    th_shap:'SHAP', th_center:'CENTER', th_spread:'SPREAD', th_miss:'MISS',
+    th_pick:'PICK',
+    btn_kde:'Density', btn_logy:'Log scale', btn_trend:'Trend line',
+    on:'ON', off:'OFF',
+    k_mean:'MEAN', k_median:'MEDIAN', k_std:'STD DEV', k_skew:'SKEWNESS',
+    k_kurt:'KURTOSIS (EXCESS)', k_miss:'MISSING', k_norm:'NORMALITY', k_n:'VALID N',
+    k_min:'MIN', k_max:'MAX', k_range:'RANGE', k_iqr:'IQR',
+    k_cv:'COEFF. OF VAR.', k_zero:'ZERO RATE',
+    k_ncat:'CATEGORIES', k_top:'LARGEST CLASS', k_topshare:'LARGEST SHARE',
+    k_imbal:'IMBALANCE', k_entropy:'ENTROPY', k_mode:'MODE',
+    k_out:'OUTLIERS', k_outpct:'OUTLIER RATE', k_fence:'FENCE',
+    v_num:'CONTINUOUS', v_cat:'CATEGORICAL', v_const:'CONSTANT',
+    v_norm:'NEAR-NORMAL', v_nonnorm:'NOT NORMAL', v_heavy:'HEAVY TAIL', v_light:'LIGHT TAIL',
+    v_right:'RIGHT-SKEWED', v_left:'LEFT-SKEWED', v_sym:'ROUGHLY SYMMETRIC',
+    yes:'YES', no:'NO',
+    lbl_valid:'VALID', lbl_cat:'CLASSES', lbl_bins:'BINS', lbl_p95:'P95 CLIP',
+    lbl_points:'PLOTTED', lbl_of_total:'of %s rows',
+    jb_line:function(jb,p){return 'Jarque–Bera statistic JB = '+jb+', p = '+p;},
+    jb_reject:function(p,n){return 'At n = '+n+', the normality test '+(p<0.05?'<b>rejects</b> normality':'<b>fails to reject</b> normality')+' (α = 0.05).';},
+    jb_note:'The larger n is, the more sensitive Jarque–Bera becomes; read it together with the absolute skewness and kurtosis.',
+    skew_note:function(g1){return 'Skewness G1 = '+g1+', '+(g1>0.5?'long right tail (right-skewed)':(g1<-0.5?'long left tail (left-skewed)':'roughly symmetric'));},
+    kurt_note:function(g2){return 'Excess kurtosis G2 = '+g2+', '+(g2>1?'sharper peak and heavier tails than normal':(g2<-1?'flatter than normal':'tail weight close to normal'));},
+    cat_note:function(top,share,imbal){return 'Categorical parameter. The largest class is <b>'+top+'</b> at <b>'+share+'</b>; max/min class imbalance is <b>'+imbal+'</b>.';},
+    dist_sub:function(a,b){return a+' valid / '+b+' bins';},
+    box_fence:function(a,b){return '1.5×IQR fence ['+a+', '+b+']';},
+    qq_ref:'normal reference μ + σz',
+    qq_sub:function(s){return s+' order statistics sampled';},
+    qq_note:'The closer the points hug the red line, the closer to normal. Ends hooking upward = heavy right tail; drooping down = heavy left tail. An S-shape in the middle means skew; both ends flaring out means excess kurtosis.',
+    box_sub:function(w1,w2){return 'Fence ['+w1+', '+w2+']';},
+    box_note:function(n,pct){return 'Using a 1.5×IQR fence, <b>'+n+'</b> shots are flagged as outliers — <b>'+pct+'</b> of valid data. Red dots are outliers, vertically jittered to avoid overplotting.';},
+    pair_sub:function(a,b){return a+' × '+b;},
+    pair_note_num:'Solid red dots are the (sampled) observations; the navy polyline is the binned median of Y along X, which reveals monotonicity and non-linear shape.',
+    pair_note_catnum:'Each class forms a jittered vertical band; gold squares mark the class <b>median</b> and the navy polyline joins them so group differences are easy to compare.',
+    pair_note_catcat:'Both axes are categorical, so a contingency heat map replaces the scatter: darker cells mean more co-occurrences.',
+    probe_done:function(p){return '<b>Player: '+p+'</b>';},
+    rel_why_num:'Both continuous → Spearman rank correlation ρ (robust to outliers and monotone non-linearity).',
+    rel_why_catnum:'One categorical, one continuous → correlation ratio η (how much of the numeric variance the classes explain).',
+    rel_why_catcat:'Both categorical → bias-corrected Cramér’s V (contingency-table association).',
+    rel_why_self:'α and β are identical, so the association is 1 by definition.',
+    rel_dir_pos:'POSITIVE', rel_dir_neg:'NEGATIVE', rel_dir_none:'NO CLEAR DIRECTION',
+    rel_dir_note:'Direction is only meaningful for continuous pairs (Spearman ρ); η and Cramér’s V are always non-negative.',
+    s_none:'Negligible', s_weak:'Weak', s_mod:'Moderate', s_strong:'Strong', s_vstrong:'Very strong',
+    mx_note:'The matrix uses <b>one consistent</b> metric: continuous×continuous = |Spearman ρ|; categorical×continuous = η; categorical×categorical = Cramér’s V. All computed on the full 102,992 rows. Click any cell to set that pair as α / β and jump back up.',
+    mx_sub:function(n){return n+' × '+n+' cells / full data';},
+    mx_top_note:'The 20 strongest pairs in the matrix, excluding self-comparisons. Pairs close to 1.000 are usually <b>two encodings of the same thing</b> (e.g. shot_clock vs shot_clock_filled, loc_y vs dist_to_baseline) — genuine column redundancy worth knowing about at modelling time. Click any row to set that pair as α / β.',
+    q_sub:function(n,hi){return n+' columns with gaps / worst '+hi;},
+    q_note:'The source is the engineered model-input table, so gaps concentrate in rolling features that need a historical window (early-season games simply do not have enough history yet). Those NaNs are handed to XGBoost natively during modelling.',
+    led_sub:function(n){return n+' rows shown';},
+    led_note:'Click a row to set α; Shift-click to set β. Columns are sortable and the box above filters by name.',
+    ledger_done:function(n,p){return n+' parameters loaded, '+p+' valid data points.';},
+    sc_sample:function(s,n){return s+' sampled / '+n+' total';},
+    foot:function(n,d0,d1){return 'SHOTSENSE · DATA PROBE · '+n+' SHOTS · '+d0+' → '+d1;},
+    foot2:'Every statistic is computed live in the browser; the correlation matrix is precomputed exactly in Python on the full dataset.',
+    boot_lines:['Initialising ShotSense Data Probe…','Decompressing the embedded dataset…','Parsing 58 parameter columns…','Inferring continuous / categorical types…','Handling missing values and valid samples…','Computing descriptive statistics (online moments)…','Loading the correlation matrix…','Building charts and interactive layer…','Done.'],
+    boot_ok:'READY', boot_fail:'LOAD FAILED',
+    err_fail:'Load failed — open the browser console for details.',
+    more:'%s more not shown',
+    sel_a:'α = %s', sel_b:'β = %s'
+  }
+};
+
+var LANG = 'zh';
+/* parameter group names come from the model table in Chinese; provide EN labels */
+var GROUP_EN = {
+  '出手型態':'Shot Type',
+  '賽況/時間':'Game State / Time',
+  '防守壓力':'Defensive Pressure',
+  '空間/幾何':'Space / Geometry',
+  '賽程/環境':'Schedule / Context',
+  '球員/球隊狀態':'Player / Team State',
+  '分區標籤':'Zone Labels'
+};
+function gname(g){ return LANG === 'en' ? (GROUP_EN[g] || g) : g; }
+function t(k){
+  var d = DICT[LANG] || DICT.zh;
+  var v = d[k];
+  if (v === undefined) v = DICT.zh[k];
+  var args = Array.prototype.slice.call(arguments, 1);
+  if (typeof v === 'function') return v.apply(null, args);
+  if (typeof v === 'string' && args.length){
+    var i = 0;
+    return v.replace(/%s/g, function(){ return args[i++]; });
+  }
+  return v;
+}
+
+/* ==========================================================================
+   2. data layer
+   ========================================================================== */
+var DATA = {};        /* name -> Float64Array */
+var PIDX = null, MADE = null, DAY = null;
+var COLS = [];        /* [{name,kind,group,shap,rank,matchup,dtype,cats}] */
+var N = 0;
+var STATS = {};       /* name -> computed stats */
+var CATSTAT = {};     /* name -> {counts, order} */
+var SORTED = {};      /* name -> Float64Array sorted (numeric, lazily) */
+
+var bootLogEl = document.getElementById('bootLog');
+var bootFill = document.getElementById('bootFill');
+var bootPct  = document.getElementById('bootPct');
+var BOOT_STEPS = 9, bootStep = 0;
+function boot(msg, frac){
+  if (msg){ var d = document.createElement('div'); d.textContent = msg; bootLogEl.appendChild(d);
+    bootLogEl.scrollTop = bootLogEl.scrollHeight; }
+  var p = Math.round((frac === undefined ? (++bootStep / BOOT_STEPS) : frac) * 100);
+  bootFill.style.width = p + '%'; bootPct.textContent = p + '%';
+}
+
+function decompress(){
+  var bin = atob(PAYLOAD);
+  var u8 = new Uint8Array(bin.length);
+  for (var i = 0; i < bin.length; i++) u8[i] = bin.charCodeAt(i);
+  var raw = fflate.gunzipSync(u8);
+  return fflate.strFromU8(raw);
+}
+
+/* char-code scanner: no split(), no intermediate strings */
+function parseLine(line, out){
+  var n = line.length, i = 0, k = 0, c;
+  while (i < n){
+    c = line.charCodeAt(i);
+    if (c === 44){ out[k++] = NaN; i++; continue; }      /* empty token */
+    var sign = 1, val = 0, scale = 0.1, hasDigit = false;
+    if (c === 45){ sign = -1; i++; } else if (c === 43){ i++; }
+    while (i < n){ c = line.charCodeAt(i); if (c >= 48 && c <= 57){ val = val * 10 + (c - 48); hasDigit = true; i++; } else break; }
+    if (i < n && line.charCodeAt(i) === 46){
+      i++;
+      while (i < n){ c = line.charCodeAt(i); if (c >= 48 && c <= 57){ val += (c - 48) * scale; scale *= 0.1; hasDigit = true; i++; } else break; }
+    }
+    if (!hasDigit){
+      while (i < n && line.charCodeAt(i) !== 44) i++;
+      out[k++] = NaN;
+    } else {
+      if (i < n){ c = line.charCodeAt(i); if (c === 101 || c === 69){
+        i++; var es = 1;
+        if (i < n && line.charCodeAt(i) === 45){ es = -1; i++; } else if (i < n && line.charCodeAt(i) === 43){ i++; }
+        var e = 0;
+        while (i < n){ c = line.charCodeAt(i); if (c >= 48 && c <= 57){ e = e * 10 + (c - 48); i++; } else break; }
+        val *= Math.pow(10, es * e);
+      } }
+      out[k++] = sign * val;
+    }
+    if (i < n && line.charCodeAt(i) === 44) i++;
+  }
+  return k;
+}
+
+/* ---- online central moments (Pébay 2008, M4 → M3 → M2 order) ---- */
+function accumulate(arr){
+  var n = arr.length, cnt = 0, mean = 0, M2 = 0, M3 = 0, M4 = 0;
+  var mn = Infinity, mx = -Infinity, zeros = 0;
+  for (var i = 0; i < n; i++){
+    var v = arr[i];
+    if (v !== v) continue;
+    cnt++;
+    if (v < mn) mn = v;
+    if (v > mx) mx = v;
+    if (v === 0) zeros++;
+    var d = v - mean, dn = d / cnt, dn2 = dn * dn, t1 = d * dn * (cnt - 1);
+    mean += dn;
+    M4 += t1 * dn2 * (cnt * cnt - 3 * cnt + 3) + 6 * dn2 * M2 - 4 * dn * M3;
+    M3 += t1 * dn * (cnt - 2) - 3 * dn * M2;
+    M2 += t1;
+  }
+  var std = cnt > 1 ? Math.sqrt(M2 / (cnt - 1)) : NaN;
+  var g1 = (cnt > 1 && M2 > 0) ? Math.sqrt(cnt) * M3 / Math.pow(M2, 1.5) : 0;
+  var G1 = cnt > 2 ? g1 * Math.sqrt(cnt * (cnt - 1)) / (cnt - 2) : g1;
+  var g2 = (cnt > 1 && M2 > 0) ? cnt * M4 / (M2 * M2) - 3 : 0;
+  var G2 = cnt > 3 ? ((cnt + 1) * g2 + 6) * (cnt - 1) / ((cnt - 2) * (cnt - 3)) : g2;
+  var jb = cnt > 3 ? cnt / 6 * (G1 * G1 + G2 * G2 / 4) : 0;
+  var p = Math.exp(-jb / 2);
+  return { n: cnt, miss: n - cnt, mean: mean, m2: M2, std: std,
+           skew: G1, kurt: G2, min: mn, max: mx, jb: jb, p: p,
+           zeros: zeros, sum: mean * cnt };
+}
+
+function sortedOf(name){
+  if (SORTED[name]) return SORTED[name];
+  var a = DATA[name], out = [];
+  for (var i = 0; i < a.length; i++){ var v = a[i]; if (v === v) out.push(v); }
+  var f = new Float64Array(out);
+  f.sort();
+  SORTED[name] = f;
+  return f;
+}
+function quantile(sorted, p){
+  var n = sorted.length;
+  if (!n) return NaN;
+  if (n === 1) return sorted[0];
+  var h = (n - 1) * p, lo = Math.floor(h), hi = Math.ceil(h);
+  return sorted[lo] + (h - lo) * (sorted[hi] - sorted[lo]);
+}
+function normInv(p){
+  if (p <= 0) return -Infinity;
+  if (p >= 1) return Infinity;
+  var a=[-3.969683028665376e+01,2.209460984245205e+02,-2.759285104469687e+02,1.383577518672690e+02,-3.066479806614716e+01,2.506628277459239e+00];
+  var b=[-5.447609879822406e+01,1.615858368580409e+02,-1.556989798598866e+02,6.680131188771972e+01,-1.328068155288572e+01];
+  var c=[-7.784894002430293e-03,-3.223964580411365e-01,-2.400758277161838e+00,-2.549732539343734e+00,4.374664141464968e+00,2.938163982698783e+00];
+  var d=[7.784695709041462e-03,3.224671290700398e-01,2.445134137142996e+00,3.754408661907416e+00];
+  var pl = 0.02425, ph = 1 - pl, q, r;
+  if (p < pl){ q = Math.sqrt(-2 * Math.log(p));
+    return (((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5]) / ((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1); }
+  if (p > ph){ q = Math.sqrt(-2 * Math.log(1 - p));
+    return -(((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5]) / ((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1); }
+  q = p - 0.5; r = q * q;
+  return (((((a[0]*r+a[1])*r+a[2])*r+a[3])*r+a[4])*r+a[5])*q / (((((b[0]*r+b[1])*r+b[2])*r+b[3])*r+b[4])*r+1);
+}
+
+/* ==========================================================================
+   3. formatting helpers
+   ========================================================================== */
+function fmtNum(v, dp){
+  if (v === null || v === undefined || v !== v || !isFinite(v)) return '—';
+  var a = Math.abs(v);
+  if (dp !== undefined) return v.toFixed(dp);
+  if (a === 0) return '0';
+  if (a >= 1e6 || a < 1e-4) return v.toExponential(2).replace('e+', 'e');
+  if (a >= 1000) return v.toLocaleString('en-US', { maximumFractionDigits: 0 });
+  if (a >= 100) return v.toFixed(1);
+  if (a >= 1) return v.toFixed(3);
+  return v.toFixed(4);
+}
+function fmtInt(v){ if (v !== v || !isFinite(v)) return '—';
+  return Math.round(v).toLocaleString('en-US'); }
+function fmtPct(v, dp){ if (v !== v || !isFinite(v)) return '—';
+  return (v * 100).toFixed(dp === undefined ? 2 : dp) + '%'; }
+function axNum(v){
+  if (v === null || v === undefined || v !== v || !isFinite(v)) return '';
+  var a = Math.abs(v);
+  if (a === 0) return '0';
+  if (a >= 1e6 || a < 1e-4) return v.toExponential(1).replace('e+', 'e');
+  if (a >= 1000) return v.toLocaleString('en-US', { maximumFractionDigits: 0 });
+  if (a >= 1) return String(Math.round(v * 1000) / 1000);
+  return String(Math.round(v * 10000) / 10000);
+}
+function esc(s){ return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+function rnd(i){ var x = Math.sin(i * 12.9898) * 43758.5453; return x - Math.floor(x); }
+
+/* ==========================================================================
+   4. ECharts retro theme
+   ========================================================================== */
+var AX = {
+  axisLine:{ show:true, lineStyle:{ color:INK, width:2 } },
+  axisTick:{ show:true, lineStyle:{ color:INK, width:2 }, length:4 },
+  axisLabel:{ color:INK, fontFamily:F_MONO, fontSize:10, formatter:axNum },
+  splitLine:{ show:true, lineStyle:{ color:GRID, width:1, type:'dashed' } }
+};
+var AXC = JSON.parse(JSON.stringify(AX));
+AXC.axisLabel = { color:INK, fontFamily:F_MONO, fontSize:10 };
+var TT = {
+  trigger:'item', appendToBody:true,
+  backgroundColor:PAPER, borderColor:INK, borderWidth:2, padding:[9, 11],
+  textStyle:{ color:INK, fontFamily:F_MONO, fontSize:11 },
+  extraCssText:'border-radius:4px;box-shadow:4px 4px 0 ' + INK + ';max-width:340px;white-space:normal;'
+};
+var LG = { textStyle:{ color:INK, fontFamily:F_MONO, fontSize:10 }, itemWidth:12, itemHeight:9,
+           icon:'roundRect', top:0, right:0, borderColor:INK, borderWidth:0 };
+function ZOOMX(sv, ev){ var z = [
+  { type:'inside', filterMode:'none' },
+  { type:'slider', filterMode:'none', height:20, bottom:6,
+    borderColor:INK, backgroundColor:PAPER2, fillerColor:'rgba(233,196,106,.35)',
+    handleStyle:{ color:RED, borderColor:INK, borderWidth:2 },
+    moveHandleStyle:{ color:INK }, dataBackground:{ lineStyle:{ color:INK, width:1 }, areaStyle:{ color:GRID } },
+    selectedDataBackground:{ lineStyle:{ color:RED, width:2 }, areaStyle:{ color:GOLD } },
+    textStyle:{ color:INK, fontFamily:F_MONO, fontSize:9 } }
+];
+  if (sv !== undefined){ z[0].startValue = sv; z[0].endValue = ev; z[1].startValue = sv; z[1].endValue = ev; }
+  return z; }
+function ZOOMY(){ return [
+  { type:'inside', filterMode:'none', yAxisIndex:0 },
+  { type:'slider', filterMode:'none', yAxisIndex:0, width:20, right:6,
+    borderColor:INK, backgroundColor:PAPER2, fillerColor:'rgba(42,157,143,.28)',
+    handleStyle:{ color:INK, borderColor:INK, borderWidth:2 },
+    textStyle:{ color:INK, fontFamily:F_MONO, fontSize:9 } }
+]; }
+function titleCfg(text, sub){
+  return { text:text, subtext:sub || '', left:0, top:0,
+    textStyle:{ color:INK, fontFamily:F_SERIF, fontWeight:900, fontSize:17 },
+    subtextStyle:{ color:MUTED, fontFamily:F_MONO, fontSize:10, fontWeight:700 } };
+}
+var CHARTS = {};
+function mk(id, option){
+  var el = document.getElementById(id);
+  if (!el) return null;
+  var c = CHARTS[id];
+  if (!c){ c = echarts.init(el, null, { renderer:'canvas' }); CHARTS[id] = c; }
+  try { c.setOption(option, true); } catch (e){ console.warn('chart ' + id + ': ' + e.message); }
+  return c;
+}
+/* categorical charts with few classes would otherwise stretch into giant slabs */
+function fitH(id, px){
+  var el = document.getElementById(id);
+  if (!el) return;
+  el.style.height = Math.round(px) + 'px';
+  if (CHARTS[id]) CHARTS[id].resize();
+}
+function clamp(v, lo, hi){ return Math.max(lo, Math.min(hi, v)); }
+/* discrete retro heat steps — solid fills, never a gradient */
+function heatStep(t){
+  if (t < 0.10) return PAPER2;
+  if (t < 0.25) return GOLD;
+  if (t < 0.50) return AMBER;
+  if (t < 0.80) return RED;
+  return INK;
+}
+function heatText(c){ return (c === RED || c === INK) ? PAPER : INK; }
+window.addEventListener('resize', function(){
+  Object.keys(CHARTS).forEach(function(k){ try { CHARTS[k].resize(); } catch (e) {} });
+});
+
+/* ==========================================================================
+   5. state
+   ========================================================================== */
+var state = { A:null, B:null, lang:'zh', open:{}, groupFilter:'__all__',
+              kde:true, logY:false, trend:true, matrixMode:'assoc',
+              ledSort:'rank', ledDir:1, ledQuery:'' };
+
+function col(name){ for (var i = 0; i < COLS.length; i++) if (COLS[i].name === name) return COLS[i]; return null; }
+function isNum(name){ var c = col(name); return c && c.kind === 'num'; }
+function pctRank(v){ return fmtPct(v, v < 0.01 ? 3 : 2); }
+
+/* ==========================================================================
+   6. sections & accordion
+   ========================================================================== */
+var SECTIONS = ['s-select','s-profile','s-dist','s-qq','s-outlier','s-pair','s-rel','s-matrix','s-quality','s-ledger'];
+var DEP = {
+  's-select':['A','B'], 's-profile':['A'], 's-dist':['A'], 's-qq':['A'], 's-outlier':['A'],
+  's-pair':['A','B'], 's-rel':['A','B'], 's-matrix':[], 's-quality':[], 's-ledger':['A','B']
+};
+var DG = { 's-select':'dgSelect', 's-profile':'dgProfile', 's-dist':'dgDist', 's-qq':'dgQq',
+           's-outlier':'dgOut', 's-pair':'dgPair', 's-rel':'dgRel', 's-matrix':'dgMatrix',
+           's-quality':'dgQuality', 's-ledger':'dgLedger' };
+var SECKEY = { 's-select':'select', 's-profile':'profile', 's-dist':'dist', 's-qq':'qq',
+               's-outlier':'out', 's-pair':'pair', 's-rel':'rel', 's-matrix':'matrix',
+               's-quality':'quality', 's-ledger':'ledger' };
+function toggleSection(id, force){
+  var el = document.getElementById(id);
+  var open = force === undefined ? !el.classList.contains('open') : !!force;
+  el.classList.toggle('open', open);
+  state.open[id] = open;
+  el.querySelector('.caret').textContent = open ? '−' : '+';
+  if (open) renderSection(id, true);
+  window.PROBE_OPEN = Object.keys(state.open).filter(function(k){ return state.open[k]; });
+}
+function renderSection(id, force){
+  switch (id){
+    case 's-select':  renderSelect(); break;
+    case 's-profile': renderProfile(); break;
+    case 's-dist':    renderDist(); break;
+    case 's-qq':      renderQQ(); break;
+    case 's-outlier': renderBox(); break;
+    case 's-pair':    renderPair(); break;
+    case 's-rel':     renderRelation(); break;
+    case 's-matrix':  renderMatrix(); break;
+    case 's-quality': renderQuality(); break;
+    case 's-ledger':  buildLedger(); break;
+  }
+  if (id === 's-pair') window.setTimeout(wirePair, 0);
+}
+
+/* ---------- point inspector (wired onto the α×β scatter) ---------- */
+function wirePair(){
+  var c = CHARTS['cPair'];
+  if (!c || c.__insp) return;
+  c.__insp = true;
+  c.on('click', function(p){
+    window.PROBE_LAST_CLICK = p ? { series:p.seriesName, value:p.value, dataIndex:p.dataIndex } : null;
+    if (!p || !p.value) return;
+    if (p.seriesName && p.seriesName !== 'shots') return;
+    var v = p.value;
+    if (!v || v.length < 3 || typeof v[2] !== 'number') return;
+    var idx = Math.round(v[2]);
+    if (!(idx >= 0 && idx < N)) return;
+    var pi = PIDX[idx], made = MADE[idx], day = DAY[idx];
+    var rows = ['<div class="stamp red" style="margin-bottom:8px">[SHOT RECORD]</div>'];
+    rows.push('<div style="font-family:' + F_SERIF + ';font-weight:900;font-size:21px;line-height:1.15;margin-bottom:8px">' +
+      esc(META.players[pi]) + '</div>');
+    rows.push('<div class="kv"><span class="k">' + t('m_fg') + '</span><span class="v">' +
+      (made ? '<span class="stamp teal">MADE</span>' : '<span class="stamp red">MISS</span>') + '</span></div>');
+    rows.push('<div class="kv"><span class="k">' + t('m_span') + '</span><span class="v mono">' + META.dateStart + ' + ' + day + ' d</span></div>');
+    rows.push('<div class="kv"><span class="k">ROW</span><span class="v mono">#' + idx + '</span></div>');
+    rows.push('<div class="hr"></div>');
+    COLS.forEach(function(cc){
+      var val = DATA[cc.name][idx], show;
+      if (cc.kind === 'cat'){ show = (cc.cats && val === val) ? esc(String(cc.cats[val])) : '—'; }
+      else { show = (val === val) ? fmtNum(val) : '<span style="color:' + RED + '">NaN</span>'; }
+      rows.push('<div class="kv"><span class="k">' + esc(cc.name) + '</span><span class="v mono">' + show + '</span></div>');
+    });
+    var box = document.getElementById('probeDetail');
+    box.innerHTML = rows.join('');
+    box.className = 'note red';
+  });
+}
+function refresh(which){
+  SECTIONS.forEach(function(id){
+    if (!state.open[id]) { digest(id); return; }
+    var d = DEP[id] || [];
+    if (!which || which === 'all' || d.indexOf(which) >= 0) renderSection(id, false);
+    digest(id);
+  });
+}
+function digest(id){
+  var el = document.getElementById(DG[id]);
+  if (!el) return;
+  var A = state.A, B = state.B, s = A ? STATS[A] : null;
+  switch (id){
+    case 's-select':  el.textContent = t('sel_a', A || '—') + '  ·  ' + t('sel_b', B || '—'); break;
+    case 's-profile':
+      if (s && isNum(A)) el.textContent = 'μ ' + fmtNum(s.mean) + ' · σ ' + fmtNum(s.std) + ' · G1 ' + fmtNum(s.skew, 2) + ' · G2 ' + fmtNum(s.kurt, 2);
+      else if (s) el.textContent = t('k_ncat') + ' ' + (CATSTAT[A] ? CATSTAT[A].order.length : 0) + ' · ' + t('k_miss') + ' ' + fmtPct(s.miss / N);
+      break;
+    case 's-dist':    el.textContent = s ? (isNum(A) ? t('lbl_valid') + ' ' + fmtInt(s.n) + ' · ' + t('k_miss') + ' ' + fmtPct(s.miss / N) : t('k_ncat') + ' ' + (CATSTAT[A] ? CATSTAT[A].order.length : 0)) : ''; break;
+    case 's-qq':      el.textContent = s && isNum(A) ? 'JB ' + fmtNum(s.jb, 1) + ' · p ' + (s.p < 1e-6 ? '<1e-6' : fmtNum(s.p, 4)) : t('no'); break;
+    case 's-outlier': el.textContent = s && isNum(A) ? t('k_out') + ' ' + fmtInt(STATS[A].out) + ' · ' + fmtPct(STATS[A].outpct) : t('no'); break;
+    case 's-pair':    el.textContent = (A || '—') + ' × ' + (B || '—'); break;
+    case 's-rel':     el.textContent = (A && B) ? (t('rel_value') + ' ' + fmtNum(assocOf(A, B), 3)) : ''; break;
+    case 's-matrix':  el.textContent = t('mx_sub', COLS.length); break;
+    case 's-quality': el.textContent = t('q_sub', MISSING.length, MISSING.length ? fmtPct(MISSING[0][1] / N) : '—'); break;
+    case 's-ledger':  el.textContent = t('led_sub', visibleLedgerRows()); break;
+  }
+}
+
+/* ==========================================================================
+   7. renderers
+   ========================================================================== */
+function statCard(k, v, n, cls){
+  return '<div class="stat ' + (cls || '') + '"><div class="k">' + k + '</div>' +
+         '<div class="v mono">' + v + '</div>' + (n ? '<div class="n">' + n + '</div>' : '') + '</div>';
+}
+function catNoteHTML(name){
+  var cs = CATSTAT[name];
+  if (!cs) return '';
+  var top = cs.order[0], topN = cs.counts[top], mn = Infinity;
+  cs.order.forEach(function(x){ if (cs.counts[x] < mn) mn = cs.counts[x]; });
+  return t('cat_note', esc(String(top)), fmtPct(topN / cs.total),
+           fmtNum(mn > 0 ? topN / mn : Infinity, 2));
+}
+
+/* ---------- 00 select ---------- */
+function renderSelect(){
+  document.getElementById('tA').textContent = state.A || '—';
+  document.getElementById('tB').textContent = state.B || '—';
+  document.getElementById('infoA').innerHTML = colInfoHTML(state.A);
+  document.getElementById('infoB').innerHTML = colInfoHTML(state.B);
+  document.getElementById('quickA').innerHTML = quickChips('A');
+  document.getElementById('quickB').innerHTML = quickChips('B');
+  var qa = document.getElementById('quickA'), qb = document.getElementById('quickB');
+  [qa, qb].forEach(function(box){
+    box.onclick = function(e){
+      var c = e.target.closest('.chip'); if (!c) return;
+      var nm = c.dataset.p, side = c.dataset.side;
+      if (side === 'A') setA(nm); else setB(nm);
+    };
+  });
+}
+function colInfoHTML(name){
+  var c = col(name); if (!c) return '<div class="note">—</div>';
+  var s = STATS[name] || {};
+  var rows = '';
+  rows += '<div class="kv"><span class="k">' + t('th_kind') + '</span><span class="v">' +
+    '<span class="tag ' + c.kind + '">' + (c.kind === 'cat' ? t('v_cat') : t('v_num')) + '</span>' +
+    (c.matchup ? ' <span class="tag matchup">MATCHUP</span>' : '') + '</span></div>';
+  rows += '<div class="kv"><span class="k">' + t('th_group') + '</span><span class="v">' + esc(gname(c.group)) + '</span></div>';
+  rows += '<div class="kv"><span class="k">' + t('th_rank') + '</span><span class="v mono">#' + c.rank + '</span></div>';
+  rows += '<div class="kv"><span class="k">' + t('th_shap') + '</span><span class="v mono">' + fmtNum(c.shap, 4) + '</span></div>';
+  rows += '<div class="kv"><span class="k">' + t('k_n') + '</span><span class="v mono">' + fmtInt(s.n) + ' / ' + fmtInt(N) + '</span></div>';
+  rows += '<div class="kv"><span class="k">' + t('k_miss') + '</span><span class="v mono">' + pctRank(s.miss / N) + '</span></div>';
+  if (c.kind === 'cat'){
+    rows += '<div class="kv"><span class="k">' + t('k_ncat') + '</span><span class="v mono">' + (c.cats ? c.cats.length : 0) + '</span></div>';
+  } else {
+    rows += '<div class="kv"><span class="k">' + t('k_mean') + '</span><span class="v mono">' + fmtNum(s.mean) + '</span></div>';
+    rows += '<div class="kv"><span class="k">' + t('k_std') + '</span><span class="v mono">' + fmtNum(s.std) + '</span></div>';
+  }
+  return rows;
+}
+function quickChips(side){
+  var picks = ['shot_dist_calc','touch_time','close_def_dist','shot_clock','score_margin_at_shot',
+               'age_at_season','defender_dist','action_type','PTS_TYPE','period'];
+  return picks.filter(function(p){ return col(p); }).map(function(p){
+    var c = col(p), sel = (side === 'A' ? state.A : state.B) === p;
+    return '<span class="chip' + (sel ? ' on' : '') + '" data-p="' + p + '" data-side="' + side + '">' +
+      esc(p) + ' <span class="tag ' + c.kind + '" style="border:0">' + c.kind + '</span></span>';
+  }).join('');
+}
+
+/* ---------- 01 profile ---------- */
+function renderProfile(){
+  var name = state.A, c = col(name), s = STATS[name], box = document.getElementById('statCards');
+  if (!c || !s){ box.innerHTML = ''; return; }
+  var html = '';
+  if (c.kind === 'num'){
+    var sorted = sortedOf(name);
+    var med = quantile(sorted, 0.5), q1 = quantile(sorted, 0.25), q3 = quantile(sorted, 0.75);
+    var iqr = q3 - q1;
+    var cv = s.mean !== 0 ? s.std / Math.abs(s.mean) : NaN;
+    var normCls = (Math.abs(s.skew) < 0.5 && Math.abs(s.kurt) < 1) ? 'ok' : (s.p < 0.05 ? 'warn' : '');
+    html += statCard(t('k_mean'), fmtNum(s.mean), '', 'ink');
+    html += statCard(t('k_median'), fmtNum(med), 'P50');
+    html += statCard(t('k_std'), fmtNum(s.std), 'σ (n−1)');
+    html += statCard(t('k_skew'), fmtNum(s.skew, 3), t(s.skew > 0.5 ? 'v_right' : (s.skew < -0.5 ? 'v_left' : 'v_sym')));
+    html += statCard(t('k_kurt'), fmtNum(s.kurt, 3), t(s.kurt > 1 ? 'v_heavy' : (s.kurt < -1 ? 'v_light' : 'v_sym')));
+    html += statCard(t('k_norm'), (Math.abs(s.skew) < 0.5 && Math.abs(s.kurt) < 1) ? t('v_norm') : t('v_nonnorm'),
+                     'JB p ' + (s.p < 1e-6 ? '<1e-6' : fmtNum(s.p, 4)), normCls);
+    html += statCard(t('k_miss'), pctRank(s.miss / N), fmtInt(s.miss) + ' / ' + fmtInt(N));
+    html += statCard(t('k_n'), fmtInt(s.n), t('lbl_of_total', fmtInt(N)));
+    html += statCard(t('k_min'), fmtNum(s.min), '');
+    html += statCard(t('k_max'), fmtNum(s.max), '');
+    html += statCard(t('k_iqr'), fmtNum(iqr), 'Q1 ' + fmtNum(q1) + ' · Q3 ' + fmtNum(q3));
+    html += statCard(t('k_cv'), fmtNum(cv, 3), 'σ / |μ|');
+    html += statCard(t('k_zero'), fmtPct(s.zeros / Math.max(s.n, 1)), fmtInt(s.zeros));
+    box.innerHTML = html;
+    document.getElementById('statNote').innerHTML =
+      '<div class="note">' + t('skew_note', fmtNum(s.skew, 3)) + '<br>' +
+      t('kurt_note', fmtNum(s.kurt, 3)) + '<br>' +
+      t('jb_line', fmtNum(s.jb, 2), s.p < 1e-6 ? '&lt;1e-6' : fmtNum(s.p, 6)) + '　' +
+      t('jb_reject', s.p, fmtInt(s.n)) + ' ' + t('jb_note') + '</div>';
+  } else {
+    var cs = CATSTAT[name], tot = cs.total, k = cs.order.length;
+    var top = cs.order[0], topN = cs.counts[top];
+    var minN = Infinity;
+    cs.order.forEach(function(x){ if (cs.counts[x] < minN) minN = cs.counts[x]; });
+    var ent = 0;
+    cs.order.forEach(function(x){ var p = cs.counts[x] / tot; if (p > 0) ent -= p * Math.log(p); });
+    html += statCard(t('k_ncat'), fmtInt(k), t('v_cat'), 'ink');
+    html += statCard(t('k_top'), esc(String(top)).slice(0, 18), fmtInt(topN));
+    html += statCard(t('k_topshare'), fmtPct(topN / tot), '');
+    html += statCard(t('k_imbal'), fmtNum(minN > 0 ? topN / minN : Infinity, 2), 'max / min');
+    html += statCard(t('k_entropy'), fmtNum(ent, 3), 'nats');
+    html += statCard(t('k_miss'), pctRank(s.miss / N), fmtInt(s.miss));
+    html += statCard(t('k_n'), fmtInt(s.n), t('lbl_of_total', fmtInt(N)));
+    box.innerHTML = html;
+    document.getElementById('statNote').innerHTML = '<div class="note">' + catNoteHTML(name) + '</div>';
+  }
+}
+
+/* ---------- 02 distribution ---------- */
+function niceBins(sorted, nb){
+  var mn = sorted[0], mx = sorted[sorted.length - 1];
+  if (mx === mn) { mx = mn + 1; }
+  var raw = (mx - mn) / nb;
+  var mag = Math.pow(10, Math.floor(Math.log10(raw)));
+  var norm = raw / mag;
+  var step = (norm <= 1 ? 1 : norm <= 2 ? 2 : norm <= 2.5 ? 2.5 : norm <= 5 ? 5 : 10) * mag;
+  var lo = Math.floor(mn / step) * step;
+  var hi = Math.ceil(mx / step) * step;
+  var count = Math.max(1, Math.round((hi - lo) / step));
+  return { lo:lo, step:step, count:count };
+}
+function renderDist(){
+  var name = state.A, c = col(name), s = STATS[name];
+  if (!c || !s) return;
+  document.getElementById('distTitle').textContent = t('sec_dist');
+  document.getElementById('btnKde').style.display = c.kind === 'cat' ? 'none' : '';
+  document.getElementById('btnLogY').style.display = c.kind === 'cat' ? 'none' : '';
+  if (c.kind === 'cat'){
+    var cs = CATSTAT[name];
+    var cats = cs.order.slice().sort(function(a, b){ return cs.counts[b] - cs.counts[a]; });
+    var data = cats.map(function(x){ return cs.counts[x]; });
+    var cols = cats.map(function(_, i){
+      return [TEAL, INK, GOLD, RED, AMBER][i % 5];
+    });
+    fitH('cDist', clamp(cats.length * 30 + 220, 380, 740));
+    mk('cDist', {
+      title: titleCfg(name, t('k_ncat') + ' ' + cats.length + ' · n = ' + fmtInt(cs.total)),
+      grid:{ left:14, right:22, top:64, bottom:96, containLabel:true },
+      tooltip: Object.assign({}, TT, { formatter:function(p){
+        return '<b>' + esc(String(p.name)) + '</b><br>' + fmtInt(p.value) + ' · ' + fmtPct(p.value / cs.total); } }),
+      xAxis: Object.assign({}, AXC, { type:'category', data:cats.map(function(x){ return String(x); }),
+        axisLabel:{ color:INK, fontFamily:F_MONO, fontSize:10, rotate:38, interval:0 } }),
+      yAxis: Object.assign({}, AX, { type:'value', name:t('lbl_valid'), nameTextStyle:{ color:MUTED, fontFamily:F_MONO, fontSize:10 } }),
+      dataZoom: cats.length > 12 ? ZOOMX() : [],
+      series:[{ type:'bar', data:data.map(function(v, i){ return { value:v, itemStyle:{ color:cols[i] } }; }),
+        barMaxWidth:44,
+        itemStyle:{ borderColor:INK, borderWidth:2 },
+        emphasis:{ itemStyle:{ color:RED } } }]
+    });
+    document.getElementById('distSub').textContent = t('k_ncat') + ' ' + cats.length;
+    document.getElementById('distNote').innerHTML = '<div class="note">' + catNoteHTML(name) + '</div>';
+    return;
+  }
+  var sorted = sortedOf(name), n = sorted.length;
+  fitH('cDist', 520);
+  var q1 = quantile(sorted, 0.25), q3 = quantile(sorted, 0.75), iqr = q3 - q1;
+  var w = 2 * iqr / Math.cbrt(n);
+  if (!(w > 0)) w = (sorted[n - 1] - sorted[0]) / Math.max(1, Math.ceil(Math.log2(n) + 1));
+  var nb = Math.ceil((sorted[n - 1] - sorted[0]) / w);
+  if (!isFinite(nb) || nb < 10) nb = 10;
+  if (nb > 70) nb = 70;
+  var B = niceBins(sorted, nb);
+  var counts = new Float64Array(B.count);
+  for (var i = 0; i < n; i++){
+    var idx = Math.floor((sorted[i] - B.lo) / B.step);
+    if (idx < 0) idx = 0;
+    if (idx >= B.count) idx = B.count - 1;
+    counts[idx]++;
+  }
+  var binData = [], maxC = 0;
+  for (var j = 0; j < B.count; j++){
+    var x0 = B.lo + j * B.step, x1 = x0 + B.step;
+    binData.push({ value:[x0, x1, counts[j]], itemStyle:{ color: (j % 2 === 0 ? GOLD : AMBER) } });
+    if (counts[j] > maxC) maxC = counts[j];
+  }
+  var series = [{
+    name:'count', type:'custom', data:binData,
+    renderItem:function(params, api){
+      var x0 = api.value(0), x1 = api.value(1), v = api.value(2);
+      var p0 = api.coord([x0, 0]), p1 = api.coord([x1, 0]), pt = api.coord([x0, v]);
+      var h = Math.max(1, p0[1] - pt[1]);
+      return { type:'rect',
+        shape:{ x:p0[0] + 0.6, y:pt[1], width:Math.max(0.8, p1[0] - p0[0] - 1.2), height:h },
+        style:api.style({ fill:api.visual('color'), stroke:INK, lineWidth:1 }) };
+    },
+    itemStyle:{ color:GOLD, borderColor:INK, borderWidth:1 },
+    encode:{ x:[0, 1], y:2 },
+    z:2
+  }];
+  var legend = [];
+  if (state.kde){
+    var mu = s.mean, sd = s.std;
+    var hb = 1.06 * sd * Math.pow(n, -0.2);
+    if (!(hb > 0)) hb = (sorted[n - 1] - sorted[0]) / 40;
+    var cap = 2600, stepK = Math.max(1, Math.floor(n / cap));
+    var gridN = 150, gx0 = sorted[0] - 0.5 * B.step, gx1 = sorted[n - 1] + 0.5 * B.step;
+    var gstep = (gx1 - gx0) / (gridN - 1);
+    var kde = [], tot = 0, used = 0;
+    for (var g = 0; g < gridN; g++){
+      var xv = gx0 + g * gstep, acc = 0;
+      for (var q = 0; q < n; q += stepK){ var z = (xv - sorted[q]) / hb; acc += Math.exp(-0.5 * z * z); }
+      used = Math.ceil(n / stepK);
+      var dens = acc / (used * hb * Math.sqrt(2 * Math.PI));
+      kde.push([xv, dens * n * B.step]);
+      tot += dens;
+    }
+    series.push({ name:'KDE', type:'line', data:kde, smooth:true, showSymbol:false,
+      lineStyle:{ color:RED, width:2.5 }, itemStyle:{ color:RED }, z:5, silent:true });
+    legend.push('KDE');
+  }
+  mk('cDist', {
+    title: titleCfg(name, B.count + ' bins × ' + fmtNum(B.step) + ' · n = ' + fmtInt(n)),
+    grid:{ left:16, right:30, top:64, bottom:104, containLabel:true },
+    tooltip: Object.assign({}, TT, {
+      trigger:'axis', axisPointer:{ type:'shadow', shadowStyle:{ color:'rgba(29,53,87,.08)' } },
+      formatter:function(ps){
+        var out = [];
+        ps.forEach(function(p){
+          if (p.seriesName === 'KDE'){ out.push('<span style="color:' + RED + '">■</span> KDE ' + fmtNum(p.value[1])); }
+          else { out.push('<span style="color:' + INK + '">■</span> [' + fmtNum(p.value[0]) + ', ' + fmtNum(p.value[1]) +
+                 ') → <b>' + fmtInt(p.value[2]) + '</b> · ' + fmtPct(p.value[2] / n)); }
+        });
+        return out.join('<br>');
+      } }),
+    xAxis: Object.assign({}, AX, { type:'value', min:B.lo, max:B.lo + B.count * B.step,
+      axisLabel:{ color:INK, fontFamily:F_MONO, fontSize:10, formatter:axNum, hideOverlap:true } }),
+    yAxis: Object.assign({}, AX, { type:'value', name:t('lbl_valid'),
+      nameTextStyle:{ color:MUTED, fontFamily:F_MONO, fontSize:10 },
+      type: state.logY ? 'log' : 'value', min: state.logY ? 0.8 : 0 }),
+    dataZoom: ZOOMX(),
+    legend: Object.assign({}, LG, { data:legend }),
+    series: series
+  });
+  document.getElementById('distSub').textContent = t('dist_sub', fmtInt(n), B.count);
+  var sk = s.skew, ku = s.kurt;
+  document.getElementById('distNote').innerHTML =
+    '<div class="note">' + t('skew_note', fmtNum(sk, 3)) + '<br>' + t('kurt_note', fmtNum(ku, 3)) +
+    '<br><b>' + t('lbl_bins') + ':</b> ' + B.count + ' × ' + fmtNum(B.step) +
+    '（Freedman–Diaconis，IQR = ' + fmtNum(iqr) + '）</div>';
+}
+
+/* ---------- 03 Q-Q ---------- */
+function renderQQ(){
+  var name = state.A, c = col(name), s = STATS[name];
+  if (!c || !s) return;
+  document.getElementById('qqTitle').textContent = t('sec_qq');
+  if (c.kind === 'cat'){
+    document.getElementById('qqCards').innerHTML = '';
+    mk('cQq', { title: titleCfg(name, t('no') + ' — ' + t('v_cat')),
+      xAxis:{ show:false }, yAxis:{ show:false },
+      series:[] });
+    document.getElementById('qqSub').textContent = '';
+    document.getElementById('qqNote').innerHTML = '<div class="note">' + catNoteHTML(name) + '</div>';
+    return;
+  }
+  var sorted = sortedOf(name), n = sorted.length;
+  var mu = s.mean, sd = s.std;
+  var m = Math.min(1600, n);
+  var step = n / m;
+  var pts = [];
+  for (var i = 0; i < m; i++){
+    var idx = Math.min(n - 1, Math.floor((i + 0.5) * step));
+    var p = (idx + 0.5) / n;
+    pts.push([normInv(p), sorted[idx]]);
+  }
+  var xmin = pts[0][0], xmax = pts[m - 1][0];
+  var line = [[xmin, mu + sd * xmin], [xmax, mu + sd * xmax]];
+  /* residual diagnostics */
+  var mae = 0, maxAbs = 0;
+  pts.forEach(function(q){
+    var d = Math.abs(q[1] - (mu + sd * q[0]));
+    mae += d; if (d > maxAbs) maxAbs = d;
+  });
+  mae /= m;
+  var r2 = 1 - (mae / (sd || 1));
+  mk('cQq', {
+    title: titleCfg(name, t('qq_ref') + ' · ' + fmtInt(m) + ' ' + t('lbl_points')),
+    grid:{ left:74, right:34, top:62, bottom:74, containLabel:true },
+    tooltip: Object.assign({}, TT, {
+      formatter:function(p){
+        if (p.seriesName === 'ref') return '<b>NORMAL REFERENCE</b><br>y = μ + σz';
+        return '<b>z = ' + fmtNum(p.value[0], 3) + '</b><br>' + t('k_mean') + ' + z·σ = ' +
+               fmtNum(mu + sd * p.value[0]) + '<br>empirical = <b>' + fmtNum(p.value[1]) + '</b>' +
+               '<br>residual = ' + fmtNum(p.value[1] - (mu + sd * p.value[0]));
+      } }),
+    xAxis: Object.assign({}, AX, { type:'value', name:'theoretical z',
+      nameLocation:'middle', nameGap:36,
+      nameTextStyle:{ color:MUTED, fontFamily:F_MONO, fontSize:10 },
+      axisLabel:{ color:INK, fontFamily:F_MONO, fontSize:10, formatter:axNum } }),
+    yAxis: Object.assign({}, AX, { type:'value', name:'empirical quantile',
+      nameLocation:'middle', nameGap:46, nameRotate:90,
+      nameTextStyle:{ color:MUTED, fontFamily:F_MONO, fontSize:10 },
+      axisLabel:{ color:INK, fontFamily:F_MONO, fontSize:10, formatter:axNum } }),
+    dataZoom: ZOOMX(),
+    series:[
+      { name:'ref', type:'line', data:line, showSymbol:false, silent:true,
+        lineStyle:{ color:RED, width:2.5, type:'solid' }, z:1 },
+      { name:'sample', type:'scatter', data:pts, symbolSize:5,
+        itemStyle:{ color:INK, opacity:.62, borderColor:PAPER, borderWidth:.5 }, z:3 }
+    ]
+  });
+  document.getElementById('qqSub').textContent = t('qq_sub', fmtInt(m));
+  var cls = (Math.abs(s.skew) < 0.5 && Math.abs(s.kurt) < 1) ? 'ok' : 'bad';
+  document.getElementById('qqCards').innerHTML =
+    statCard('JARQUE–BERA', fmtNum(s.jb, 1), 'JB = n/6·(G1² + G2²/4)', 'ink') +
+    statCard('p-VALUE', s.p < 1e-6 ? '&lt;1e-6' : fmtNum(s.p, 4), 'α = 0.05', cls) +
+    statCard(t('k_skew'), fmtNum(s.skew, 3), t(s.skew > 0.5 ? 'v_right' : (s.skew < -0.5 ? 'v_left' : 'v_sym'))) +
+    statCard(t('k_kurt'), fmtNum(s.kurt, 3), t(s.kurt > 1 ? 'v_heavy' : (s.kurt < -1 ? 'v_light' : 'v_sym')), cls);
+  document.getElementById('qqNote').innerHTML =
+    '<div class="note red">' + t('qq_note') + '<br>' +
+    t('jb_line', fmtNum(s.jb, 2), s.p < 1e-6 ? '&lt;1e-6' : fmtNum(s.p, 6)) + '　' +
+    t('jb_reject', s.p, fmtInt(s.n)) + ' ' + t('jb_note') + '</div>';
+}
+
+/* ---------- 04 box plot ---------- */
+function renderBox(){
+  var name = state.A, c = col(name), s = STATS[name];
+  if (!c || !s) return;
+  document.getElementById('boxTitle').textContent = t('sec_out');
+  if (c.kind === 'cat'){
+    document.getElementById('boxCards').innerHTML = '';
+    mk('cBox', { title: titleCfg(name, t('no') + ' — ' + t('v_cat')),
+      xAxis:{ show:false }, yAxis:{ show:false }, series:[] });
+    document.getElementById('boxSub').textContent = '';
+    document.getElementById('boxNote').innerHTML = '<div class="note">' + t('v_cat') + ' → ' + t('sec_dist') + '</div>';
+    return;
+  }
+  var sorted = sortedOf(name), n = sorted.length;
+  var q1 = quantile(sorted, 0.25), med = quantile(sorted, 0.5), q3 = quantile(sorted, 0.75);
+  var iqr = q3 - q1;
+  var lo = q1 - 1.5 * iqr, hi = q3 + 1.5 * iqr;
+  var wLo = sorted[0], wHi = sorted[n - 1];
+  for (var i = 0; i < n; i++){ if (sorted[i] >= lo){ wLo = sorted[i]; break; } }
+  for (var j = n - 1; j >= 0; j--){ if (sorted[j] <= hi){ wHi = sorted[j]; break; } }
+  var out = [], cap = 4200;
+  for (var k2 = 0; k2 < n; k2++){ var v = sorted[k2]; if (v < lo || v > hi) out.push(v); }
+  var outTotal = out.length;
+  var pick = out;
+  if (out.length > cap){ var st = out.length / cap; pick = []; for (var q = 0; q < cap; q++) pick.push(out[Math.floor(q * st)]); }
+  var jitter = pick.map(function(v, i){ return [v, 0.5 + (rnd(i) - 0.5) * 0.44]; });
+
+  /* the axis always spans the full data range so fliers are never clipped,
+     but the initial zoom window hugs the whiskers so the box stays readable */
+  var axLo = s.min, axHi = s.max;
+  if (!(axHi > axLo)){ axLo = axLo - 1; axHi = axHi + 1; }
+  var pad = 0.10 * (wHi - wLo) || (axHi - axLo) * 0.02 || 1;
+  var zLo = Math.max(axLo, wLo - pad), zHi = Math.min(axHi, wHi + pad);
+  if (!(zHi > zLo)){ zLo = axLo; zHi = axHi; }
+
+  var boxSeries = {
+    name:'box', type:'custom', silent:true, z:4,
+    data:[0],
+    renderItem:function(params, api){
+      var sz = api.size([0, 1]);
+      var h = Math.min(Math.max(sz[1] * 0.34, 26), 62);
+      var cQ1 = api.coord([q1, 0.5]), cQ3 = api.coord([q3, 0.5]);
+      var cMed = api.coord([med, 0.5]);
+      var cLo = api.coord([wLo, 0.5]), cHi = api.coord([wHi, 0.5]);
+      var y = cQ1[1], x1 = Math.min(cQ1[0], cQ3[0]), x2 = Math.max(cQ1[0], cQ3[0]);
+      var kids = [];
+      kids.push({ type:'line', shape:{ x1:cLo[0], y1:y, x2:cHi[0], y2:y },
+        style:{ stroke:INK, lineWidth:2 }, z:3 });
+      kids.push({ type:'line', shape:{ x1:cLo[0], y1:y - h * 0.34, x2:cLo[0], y2:y + h * 0.34 },
+        style:{ stroke:INK, lineWidth:2 }, z:3 });
+      kids.push({ type:'line', shape:{ x1:cHi[0], y1:y - h * 0.34, x2:cHi[0], y2:y + h * 0.34 },
+        style:{ stroke:INK, lineWidth:2 }, z:3 });
+      kids.push({ type:'rect', shape:{ x:x1, y:y - h / 2, width:Math.max(2, x2 - x1), height:h },
+        style:{ fill:GOLD, stroke:INK, lineWidth:2 }, z:4 });
+      kids.push({ type:'line', shape:{ x1:cMed[0], y1:y - h / 2, x2:cMed[0], y2:y + h / 2 },
+        style:{ stroke:RED, lineWidth:3.5 }, z:5 });
+      return { type:'group', children:kids };
+    }
+  };
+  mk('cBox', {
+    title: titleCfg(name, t('box_fence', fmtNum(wLo), fmtNum(wHi))),
+    grid:{ left:16, right:30, top:56, bottom:58, containLabel:true },
+    tooltip: Object.assign({}, TT, {
+      formatter:function(p){
+        if (p.seriesName === 'fliers') return '<b>OUTLIER</b><br>' + fmtNum(p.value[0]);
+        if (p.seriesName === 'box') return '<b>' + esc(name) + '</b><br>min ' + fmtNum(wLo) +
+          '<br>Q1 ' + fmtNum(q1) + '<br>median ' + fmtNum(med) + '<br>Q3 ' + fmtNum(q3) +
+          '<br>max ' + fmtNum(wHi) + '<br>IQR ' + fmtNum(iqr);
+        return '';
+      } }),
+    xAxis: Object.assign({}, AX, { type:'value', min:axLo, max:axHi,
+      name:name, nameGap:30, nameLocation:'middle',
+      nameTextStyle:{ color:INK, fontFamily:F_MONO, fontSize:11, fontWeight:700 },
+      axisLabel:{ color:INK, fontFamily:F_MONO, fontSize:10, formatter:axNum, hideOverlap:true } }),
+    yAxis: { type:'value', min:0, max:1, show:false },
+    dataZoom: ZOOMX(zLo, zHi),
+    series:[
+      boxSeries,
+      { name:'fliers', type:'scatter', data:jitter, symbolSize:5,
+        itemStyle:{ color:RED, opacity:.55, borderColor:INK, borderWidth:.7 }, z:6,
+        emphasis:{ itemStyle:{ opacity:1 } } }
+    ]
+  });
+  document.getElementById('boxSub').textContent = t('box_sub', fmtNum(wLo), fmtNum(wHi));
+  var pct = outTotal / n;
+  document.getElementById('boxCards').innerHTML =
+    statCard(t('k_median'), fmtNum(med), 'P50', 'ink') +
+    statCard(t('k_iqr'), fmtNum(iqr), 'Q3 − Q1 = ' + fmtNum(q3) + ' − ' + fmtNum(q1)) +
+    statCard(t('k_out'), fmtInt(outTotal), t('k_outpct') + ' ' + fmtPct(pct), outTotal > 0 ? 'warn' : 'ok') +
+    statCard(t('k_range'), fmtNum(s.max - s.min), fmtNum(s.min) + ' → ' + fmtNum(s.max));
+  document.getElementById('boxNote').innerHTML =
+    '<div class="note">' + t('box_note', fmtInt(outTotal), fmtPct(pct)) +
+    (outTotal > cap ? ' ' + t('more', fmtInt(outTotal - cap)) : '') + '</div>';
+}
+
+/* ---------- 05 bivariate ---------- */
+function pairSampler(a, b, cap){
+  var n = DATA[a].length, keep = [], step = n / cap;
+  var useStep = n > cap;
+  for (var i = 0; i < n; i++){
+    if (useStep && i % Math.max(1, Math.round(step)) !== 0) continue;
+    var x = DATA[a][i], y = DATA[b][i];
+    if (x !== x || y !== y) continue;
+    keep.push(i);
+  }
+  return keep;
+}
+function renderPair(){
+  var a = state.A, b = state.B, ca = col(a), cb = col(b);
+  if (!ca || !cb) return;
+  document.getElementById('pairTitle').textContent = t('sec_pair');
+  document.getElementById('pairSub').textContent = t('pair_sub', ca.kind.toUpperCase(), cb.kind.toUpperCase());
+  document.getElementById('probeDetail').innerHTML = t('probe_empty');
+  var chartId = 'cPair';
+  fitH(chartId, 520);
+
+  if (ca.kind === 'num' && cb.kind === 'num'){
+    var cap = 24000, idx = pairSampler(a, b, cap);
+    var total = 0;
+    for (var i0 = 0; i0 < DATA[a].length; i0++){ if (DATA[a][i0] === DATA[a][i0] && DATA[b][i0] === DATA[b][i0]) total++; }
+    var pts = new Array(idx.length);
+    for (var i = 0; i < idx.length; i++){
+      var k = idx[i];
+      pts[i] = { value:[DATA[a][k], DATA[b][k], k] };
+    }
+    var series = [{ name:'shots', type:'scatter', data:pts, symbolSize:5,
+      large:true, largeThreshold:2000,
+      itemStyle:{ color:RED, opacity:.42, borderColor:INK, borderWidth:.6 }, z:2 }];
+    var legend = ['shots'];
+    if (state.trend){
+      var bins = 26, sx = DATA[a], sy = DATA[b];
+      var mn = STATS[a].min, mx = STATS[a].max, w = (mx - mn) / bins || 1;
+      var acc = [], cnt = [];
+      for (var g = 0; g < bins; g++){ acc.push([]); cnt.push(0); }
+      for (var j = 0; j < idx.length; j++){
+        var kk = idx[j], bi = Math.floor((sx[kk] - mn) / w);
+        if (bi < 0) bi = 0; if (bi >= bins) bi = bins - 1;
+        acc[bi].push(sy[kk]); cnt[bi]++;
+      }
+      var trend = [];
+      for (var g2 = 0; g2 < bins; g2++){
+        if (acc[g2].length < 12) continue;
+        var arr = acc[g2].slice().sort(function(p, q){ return p - q; });
+        trend.push([mn + (g2 + 0.5) * w, quantile(new Float64Array(arr), 0.5)]);
+      }
+      series.push({ name:'median', type:'line', data:trend, showSymbol:true, symbolSize:6,
+        smooth:true, silent:true, lineStyle:{ color:INK, width:2.5 },
+        itemStyle:{ color:INK, borderColor:PAPER, borderWidth:1 }, z:5 });
+      legend.push('median');
+    }
+    mk(chartId, {
+      title: titleCfg(a + '  ×  ' + b, 'n = ' + fmtInt(total)),
+      grid:{ left:74, right:30, top:64, bottom:104, containLabel:true },
+      tooltip: Object.assign({}, TT, { formatter:function(p){
+        if (p.seriesName === 'median') return '<b>BINNED MEDIAN</b><br>' + a + ' ≈ ' + fmtNum(p.value[0]) + '<br>median(' + b + ') = ' + fmtNum(p.value[1]);
+        var v = p.value, row = v[2];
+        return '<b>' + esc(META.players[PIDX[row]]) + '</b><br>' + a + ' = ' + fmtNum(v[0]) +
+               '<br>' + b + ' = ' + fmtNum(v[1]) + '<br>' + t('m_fg') + ' = ' + (MADE[row] ? 'MADE' : 'MISS') +
+               '<br>day ' + DAY[row];
+      } }),
+      xAxis: Object.assign({}, AX, { type:'value', name:a, nameGap:32, nameLocation:'middle',
+        nameTextStyle:{ color:INK, fontFamily:F_MONO, fontSize:11, fontWeight:700 },
+        axisLabel:{ color:INK, fontFamily:F_MONO, fontSize:10, formatter:axNum, hideOverlap:true } }),
+      yAxis: Object.assign({}, AX, { type:'value', name:b, nameGap:58, nameRotate:90, nameLocation:'middle',
+        nameTextStyle:{ color:INK, fontFamily:F_MONO, fontSize:11, fontWeight:700 },
+        axisLabel:{ color:INK, fontFamily:F_MONO, fontSize:10, formatter:axNum } }),
+      dataZoom: ZOOMX(),
+      legend: Object.assign({}, LG, { data:legend }),
+      series: series
+    });
+    document.getElementById('pairSub').textContent = t('sc_sample', fmtInt(idx.length), fmtInt(total));
+    document.getElementById('pairNote').innerHTML = '<div class="note teal">' + t('pair_note_num') + '</div>';
+    return;
+  }
+
+  if (ca.kind === 'cat' && cb.kind === 'num'){
+    var cs = CATSTAT[a], cats = cs.order.slice();
+    var groups = {}, means = [];
+    cats.forEach(function(x, i){ groups[i] = []; });
+    var nTot = DATA[a].length;
+    for (var m2 = 0; m2 < nTot; m2++){
+      var cx = DATA[a][m2], cy = DATA[b][m2];
+      if (cx !== cx || cy !== cy) continue;
+      groups[cx].push(m2);
+    }
+    var data = [], cap2 = 24000, stride = Math.max(1, Math.floor(nTot / cap2));
+    var gi = 0;
+    cats.forEach(function(x, ci){
+      var rows = groups[ci];
+      for (var q = 0; q < rows.length; q += stride){
+        var row = rows[q];
+        data.push({ value:[ci + (rnd(gi++) - 0.5) * 0.52, DATA[b][row], row],
+                    itemStyle:{ color:TEAL, opacity:.4 } });
+      }
+      var vals = rows.map(function(r){ return DATA[b][r]; });
+      var sortedG = new Float64Array(vals); sortedG.sort();
+      means.push([ci, quantile(sortedG, 0.5), x]);
+    });
+    mk(chartId, {
+      title: titleCfg(a + '  ×  ' + b, cats.length + ' classes'),
+      grid:{ left:74, right:30, top:64, bottom:104, containLabel:true },
+      tooltip: Object.assign({}, TT, { formatter:function(p){
+        if (p.seriesName === 'median') return '<b>' + esc(String(p.value[2])) + '</b><br>median(' + b + ') = ' + fmtNum(p.value[1]);
+        var v = p.value, row = v[2];
+        return '<b>' + esc(String(cats[Math.round(v[0])])) + '</b>　<b>' + esc(META.players[PIDX[row]]) + '</b>' +
+               '<br>' + b + ' = ' + fmtNum(v[1]) + '<br>' + t('m_fg') + ' = ' + (MADE[row] ? 'MADE' : 'MISS') +
+               '<br>day ' + DAY[row];
+      } }),
+      xAxis: Object.assign({}, AXC, { type:'category', data:cats.map(String),
+        axisLabel:{ color:INK, fontFamily:F_MONO, fontSize:10, rotate:34, interval:0 } }),
+      yAxis: Object.assign({}, AX, { type:'value', name:b, nameGap:58, nameRotate:90, nameLocation:'middle',
+        nameTextStyle:{ color:INK, fontFamily:F_MONO, fontSize:11, fontWeight:700 },
+        axisLabel:{ color:INK, fontFamily:F_MONO, fontSize:10, formatter:axNum } }),
+      dataZoom: ZOOMX(),
+      legend: Object.assign({}, LG, { data:['shots', 'median'] }),
+      series:[
+        { name:'shots', type:'scatter', data:data, symbolSize:4.5, large:true, largeThreshold:2000,
+          itemStyle:{ color:TEAL, opacity:.4 }, z:2 },
+        { name:'median', type:'line', data:means.map(function(d, i){ return { value:d, itemStyle:{ color:GOLD } }; }),
+          showSymbol:true, symbol:'rect', symbolSize:12, silent:true,
+          lineStyle:{ color:INK, width:2.5 }, itemStyle:{ color:GOLD, borderColor:INK, borderWidth:2 }, z:6 }
+      ]
+    });
+    document.getElementById('pairNote').innerHTML = '<div class="note teal">' + t('pair_note_catnum') + '</div>';
+    return;
+  }
+
+  if (ca.kind === 'num' && cb.kind === 'cat'){
+    var tmp = state.A; state.A = b; state.B = a;
+    renderPair();
+    state.A = tmp; state.B = b;
+    return;
+  }
+
+  /* cat × cat : contingency heat map */
+  var ca2 = CATSTAT[a], cb2 = CATSTAT[b];
+  var rows = ca2.order, cols = cb2.order;
+  var grid = [], maxV = 0, table = {};
+  rows.forEach(function(r, ri){ table[r] = {}; cols.forEach(function(cc){ table[r][cc] = 0; }); });
+  var nAll = DATA[a].length;
+  for (var z2 = 0; z2 < nAll; z2++){
+    var vx = DATA[a][z2], vy = DATA[b][z2];
+    if (vx !== vx || vy !== vy) continue;
+    table[rows[vx]][cols[vy]]++;
+  }
+  rows.forEach(function(r, ri){ cols.forEach(function(cc, ci){
+    var v = table[r][cc];
+    if (v > maxV) maxV = v;
+  }); });
+  rows.forEach(function(r, ri){ cols.forEach(function(cc, ci){
+    var v = table[r][cc], col = heatStep(maxV > 0 ? v / maxV : 0);
+    grid.push({ value:[ci, ri, v], itemStyle:{ color:col }, label:{ color:heatText(col) } });
+  }); });
+  fitH(chartId, clamp(rows.length * 48 + 210, 320, 720));
+  var mv = Math.max(maxV, 1);
+  mk(chartId, {
+    title: titleCfg(a + '  ×  ' + b, rows.length + ' × ' + cols.length + ' contingency'),
+    grid:{ left:14, right:26, top:64, bottom:96, containLabel:true },
+    tooltip: Object.assign({}, TT, { formatter:function(p){
+      return '<b>' + esc(String(rows[p.value[1]])) + '</b> × <b>' + esc(String(cols[p.value[0]])) + '</b><br>' +
+             fmtInt(p.value[2]) + ' · ' + fmtPct(p.value[2] / nAll); } }),
+    xAxis: Object.assign({}, AXC, { type:'category', data:cols.map(String),
+      splitArea:{ show:true, areaStyle:{ color:[PAPER2, '#F7F3DE'] } },
+      axisLabel:{ color:INK, fontFamily:F_MONO, fontSize:10, rotate:34, interval:0 } }),
+    yAxis: Object.assign({}, AXC, { type:'category', data:rows.map(String),
+      splitArea:{ show:true, areaStyle:{ color:[PAPER2, '#F7F3DE'] } },
+      axisLabel:{ color:INK, fontFamily:F_MONO, fontSize:10 } }),
+    visualMap:{ type:'piecewise', pieces:[
+        { min:0, max:mv * 0.10, color:PAPER2, label:'0 – ' + Math.round(mv * 0.10) },
+        { min:mv * 0.10, max:mv * 0.25, color:GOLD, label:'—' },
+        { min:mv * 0.25, max:mv * 0.50, color:AMBER, label:'—' },
+        { min:mv * 0.50, max:mv * 0.80, color:RED, label:'—' },
+        { min:mv * 0.80, max:mv + 1, color:INK, label:'— ' + fmtInt(maxV) }],
+      left:'center', bottom:0, orient:'horizontal', itemWidth:14, itemHeight:13,
+      textStyle:{ color:INK, fontFamily:F_MONO, fontSize:9 },
+      borderColor:INK, borderWidth:2, showLabel:true },
+    series:[{ type:'heatmap', data:grid,
+      label:{ show:grid.length <= 90, fontFamily:F_MONO, fontSize:10 },
+      itemStyle:{ borderColor:INK, borderWidth:1.4 },
+      emphasis:{ itemStyle:{ borderColor:RED, borderWidth:3 } } }]
+  });
+  document.getElementById('pairNote').innerHTML = '<div class="note teal">' + t('pair_note_catcat') + '</div>';
+}
+
+/* ---------- 06 relation ---------- */
+var CORR = {};
+function corrIdx(i, j, k){ return i * k + j; }
+function assocOf(a, b){
+  var i = COLS.findIndex(function(c){ return c.name === a; });
+  var j = COLS.findIndex(function(c){ return c.name === b; });
+  if (i < 0 || j < 0) return NaN;
+  var k = COLS.length;
+  if (state.matrixMode === 'spear'){
+    var v = META.corr.spearman[corrIdx(i, j, k)];
+    return v === null ? NaN : v;
+  }
+  var w = META.corr.assoc[corrIdx(i, j, k)];
+  return w === null ? NaN : w;
+}
+function strength(v){
+  var a = Math.abs(v);
+  if (a < 0.1) return { i:1, k:'s_none', cls:'g' };
+  if (a < 0.25) return { i:2, k:'s_weak', cls:'g' };
+  if (a < 0.45) return { i:3, k:'s_mod', cls:'g' };
+  if (a < 0.7) return { i:4, k:'s_strong', cls:'f' };
+  return { i:5, k:'s_vstrong', cls:'f' };
+}
+function renderRelation(){
+  var a = state.A, b = state.B, ca = col(a), cb = col(b);
+  if (!ca || !cb) return;
+  var v = assocOf(a, b);
+  var self = (a === b);
+  var why = self ? t('rel_why_self')
+    : (ca.kind === 'num' && cb.kind === 'num') ? t('rel_why_num')
+    : ((ca.kind === 'cat' && cb.kind === 'num') || (ca.kind === 'num' && cb.kind === 'cat')) ? t('rel_why_catnum')
+    : t('rel_why_catcat');
+  var mname = self ? '—' : (ca.kind === 'num' && cb.kind === 'num') ? 'Spearman ρ'
+    : ((ca.kind === 'cat' && cb.kind === 'num') || (ca.kind === 'num' && cb.kind === 'cat')) ? 'correlation ratio η'
+    : "Cramér's V";
+  var st = strength(isFinite(v) ? v : 0);
+  document.getElementById('relName').textContent = mname;
+  document.getElementById('relWhy').textContent = why;
+  document.getElementById('relVal').textContent = isFinite(v) ? fmtNum(v, 3) : '—';
+  document.getElementById('relLabel').textContent = t(st.k);
+  document.getElementById('relMeter').innerHTML = [0,1,2,3,4].map(function(i){
+    return '<i class="' + (i < st.i ? st.cls : '') + '"></i>';
+  }).join('');
+  var dirEl = document.getElementById('relDir');
+  if (self){ dirEl.textContent = '—'; }
+  else if (ca.kind === 'num' && cb.kind === 'num'){
+    dirEl.textContent = v > 0.02 ? t('rel_dir_pos') : (v < -0.02 ? t('rel_dir_neg') : t('rel_dir_none'));
+  } else { dirEl.textContent = t('rel_dir_none'); }
+  document.getElementById('relDirNote').textContent = t('rel_dir_note');
+
+  var body = [];
+  body.push('<div class="kv"><span class="k">α</span><span class="v mono">' + esc(a) + ' (' + t(ca.kind === 'cat' ? 'v_cat' : 'v_num') + ')</span></div>');
+  body.push('<div class="kv"><span class="k">β</span><span class="v mono">' + esc(b) + ' (' + t(cb.kind === 'cat' ? 'v_cat' : 'v_num') + ')</span></div>');
+  body.push('<div class="kv"><span class="k">' + t('rel_measure') + '</span><span class="v mono">' + mname + ' = ' + (isFinite(v) ? fmtNum(v, 4) : '—') + '</span></div>');
+  if (ca.kind === 'num' && cb.kind === 'num' && !self){
+    var pa = pearson(a, b);
+    body.push('<div class="kv"><span class="k">Pearson r</span><span class="v mono">' + fmtNum(pa, 4) + '</span></div>');
+    body.push('<div class="kv"><span class="k">|ρ| − |r|</span><span class="v mono">' + fmtNum(Math.abs(v) - Math.abs(pa), 4) + '　<span style="color:' + MUTED + '">(單調 vs 線性)</span></span></div>');
+    var sA = STATS[a], sB = STATS[b];
+    body.push('<div class="kv"><span class="k">G1 (α / β)</span><span class="v mono">' + fmtNum(sA.skew, 3) + ' / ' + fmtNum(sB.skew, 3) + '</span></div>');
+    body.push('<div class="kv"><span class="k">G2 (α / β)</span><span class="v mono">' + fmtNum(sA.kurt, 3) + ' / ' + fmtNum(sB.kurt, 3) + '</span></div>');
+  }
+  body.push('<div class="kv"><span class="k">' + t('k_n') + '</span><span class="v mono">' + fmtInt(Math.min(STATS[a].n, STATS[b].n)) + '</span></div>');
+  document.getElementById('relBody').innerHTML = body.join('');
+}
+function pearson(a, b){
+  var x = DATA[a], y = DATA[b], n = 0, sx = 0, sy = 0, sxx = 0, syy = 0, sxy = 0;
+  for (var i = 0; i < x.length; i++){
+    var u = x[i], w = y[i];
+    if (u !== u || w !== w) continue;
+    n++; sx += u; sy += w; sxx += u * u; syy += w * w; sxy += u * w;
+  }
+  if (n < 3) return NaN;
+  var cov = sxy - sx * sy / n;
+  var vx = sxx - sx * sx / n, vy = syy - sy * sy / n;
+  var den = Math.sqrt(vx * vy);
+  return den > 0 ? cov / den : NaN;
+}
+
+/* ---------- 07 matrix ---------- */
+function heatColor(v){
+  if (v === null || v !== v) return '#EFEAD6';
+  var a = Math.abs(v);
+  if (a < 0.10) return PAPER2;
+  if (a < 0.25) return GOLD;
+  if (a < 0.45) return AMBER;
+  if (a < 0.70) return RED;
+  return INK;
+}
+function renderMatrix(){
+  var k = COLS.length;
+  var src = state.matrixMode === 'spear' ? META.corr.spearman : META.corr.assoc;
+  var names = COLS.map(function(c){ return c.name; });
+  var data = [];
+  var vmax = 0;
+  for (var i = 0; i < k; i++){
+    for (var j = 0; j < k; j++){
+      var v = src[i * k + j];
+      if (v === null) v = NaN;
+      if (i === j) v = 1;
+      if (isFinite(v) && Math.abs(v) > vmax) vmax = Math.abs(v);
+      data.push([j, i, isFinite(v) ? Math.round(Math.abs(v) * 1000) / 1000 : NaN]);
+    }
+  }
+  mk('cHeat', {
+    title: titleCfg(k + ' × ' + k + ' · ' + (state.matrixMode === 'spear' ? 'Spearman ρ' : t('mx_assoc')),
+                   t('mx_sub', k) + '  ·  max |v| = ' + fmtNum(vmax, 3)),
+    grid:{ left:14, right:26, top:74, bottom:52, containLabel:true },
+    tooltip: Object.assign({}, TT, { formatter:function(p){
+      var a = names[p.value[1]], b = names[p.value[0]];
+      var val = p.value[2];
+      return '<b>' + esc(a) + '</b> × <b>' + esc(b) + '</b><br>' +
+             (isFinite(val) ? 'value = ' + fmtNum(val, 3) + ' · ' + t(strength(val).k) : 'n/a') +
+             '<br><span style="color:' + MUTED + '">click to set α / β</span>';
+    } }),
+    xAxis: Object.assign({}, AXC, { type:'category', data:names,
+      splitArea:{ show:true, areaStyle:{ color:[PAPER2, '#F7F3DE'] } },
+      axisLabel:{ color:INK, fontFamily:F_MONO, fontSize:8.5, rotate:90, interval:0 } }),
+    yAxis: Object.assign({}, AXC, { type:'category', data:names,
+      splitArea:{ show:true, areaStyle:{ color:[PAPER2, '#F7F3DE'] } },
+      axisLabel:{ color:INK, fontFamily:F_MONO, fontSize:8.5, interval:0 } }),
+    visualMap:{ type:'piecewise', pieces:[
+        { min:0, max:0.1, color:PAPER2, label:'0.00 – 0.10' },
+        { min:0.1, max:0.25, color:GOLD, label:'0.10 – 0.25' },
+        { min:0.25, max:0.45, color:AMBER, label:'0.25 – 0.45' },
+        { min:0.45, max:0.7, color:RED, label:'0.45 – 0.70' },
+        { min:0.7, max:1.01, color:INK, label:'0.70 – 1.00' }],
+      left:0, bottom:0, orient:'horizontal', itemWidth:15, itemHeight:14,
+      textStyle:{ color:INK, fontFamily:F_MONO, fontSize:9 },
+      borderColor:INK, borderWidth:2, showLabel:true },
+    series:[{ type:'heatmap', data:data, progressive:4000, animation:false,
+      itemStyle:{ borderColor:'#D9D2BC', borderWidth:.6 },
+      emphasis:{ itemStyle:{ borderColor:RED, borderWidth:2.5 } } }]
+  });
+  var c = CHARTS['cHeat'];
+  if (c && !c.__wired){
+    c.__wired = true;
+    c.on('click', function(p){
+      if (!p || !p.value) return;
+      var bi = p.value[0], ai = p.value[1];
+      var aName = names[ai], bName = names[bi];
+      if (ai === bi){ setA(aName); return; }
+      setA(aName); setB(bName);
+      markLedger();
+      document.getElementById('s-rel').scrollIntoView({ behavior:'smooth', block:'start' });
+      window.setTimeout(function(){ toggleSection('s-rel', true); }, 320);
+    });
+  }
+  document.getElementById('mxSub').textContent = t('mx_sub', k);
+  document.getElementById('mxNote').innerHTML = '<div class="note red">' + t('mx_note') + '</div>';
+  buildTopPairs(src, names, k);
+}
+function buildTopPairs(src, names, k){
+  var list = [];
+  for (var i = 0; i < k; i++) for (var j = i + 1; j < k; j++){
+    var v = src[i * k + j];
+    if (v === null || v !== v) continue;
+    list.push([Math.abs(v), i, j, v]);
+  }
+  list.sort(function(a, b){ return b[0] - a[0]; });
+  var rows = list.slice(0, 20).map(function(r){
+    var cls = col(names[r[1]]), cls2 = col(names[r[2]]);
+    var st = strength(r[3]);
+    return '<tr data-a="' + esc(names[r[1]]) + '" data-b="' + esc(names[r[2]]) + '">' +
+      '<td class="num mono">' + fmtNum(r[3], 4) + '</td>' +
+      '<td>' + esc(names[r[1]]) + ' <span class="tag ' + cls.kind + '">' + cls.kind + '</span></td>' +
+      '<td>' + esc(names[r[2]]) + ' <span class="tag ' + cls2.kind + '">' + cls2.kind + '</span></td>' +
+      '<td>' + t(st.k) + '</td>' +
+      '<td><button class="btn sm" data-pick="1">α/β</button></td></tr>';
+  }).join('');
+  var tbl = document.getElementById('topPairs');
+  tbl.querySelector('tbody').innerHTML = rows;
+  tbl.querySelector('tbody').onclick = function(e){
+    var tr = e.target.closest('tr'); if (!tr) return;
+    setA(tr.dataset.a); setB(tr.dataset.b); markLedger();
+  };
+  document.getElementById('topNote').innerHTML = '<div class="note gold">' + t('mx_top_note') + '</div>';
+}
+
+/* ---------- 08 missingness ---------- */
+var MISSING = [];
+function renderQuality(){
+  var rows = COLS.map(function(c){ return [c.name, STATS[c.name].miss, c.kind, c.group]; })
+                 .filter(function(r){ return r[1] > 0; })
+                 .sort(function(a, b){ return b[1] - a[1]; });
+  MISSING = rows;
+  var names = rows.map(function(r){ return r[0]; });
+  var vals = rows.map(function(r){ return r[1] / N; });
+  var colors = vals.map(function(v){ return v < 0.005 ? TEAL : v < 0.05 ? GOLD : v < 0.2 ? AMBER : RED; });
+  mk('cMiss', {
+    title: titleCfg(t('q_title'), rows.length + ' / ' + COLS.length + ' columns'),
+    grid:{ left:14, right:60, top:64, bottom:34, containLabel:true },
+    tooltip: Object.assign({}, TT, { formatter:function(p){
+      var i = p.dataIndex;
+      return '<b>' + esc(names[i]) + '</b><br>' + fmtInt(rows[i][1]) + ' missing · ' + fmtPct(vals[i], 3) +
+             '<br>' + rows[i][3];
+    } }),
+    xAxis: Object.assign({}, AX, { type:'value', max: Math.max(0.02, Math.ceil(Math.max.apply(null, vals.concat([0])) * 20) / 20),
+      axisLabel:{ color:INK, fontFamily:F_MONO, fontSize:10, formatter:function(v){ return (v * 100).toFixed(1) + '%'; } } }),
+    yAxis: Object.assign({}, AXC, { type:'category', inverse:true, data:names,
+      axisLabel:{ color:INK, fontFamily:F_MONO, fontSize:9.5 } }),
+    dataZoom: [{ type:'inside', yAxisIndex:0, filterMode:'none' },
+               { type:'slider', yAxisIndex:0, filterMode:'none', width:18, right:6,
+                 borderColor:INK, backgroundColor:PAPER2, fillerColor:'rgba(244,162,97,.3)',
+                 handleStyle:{ color:INK, borderColor:INK, borderWidth:2 },
+                 textStyle:{ color:INK, fontFamily:F_MONO, fontSize:9 } }],
+    series:[{ type:'bar', data:vals.map(function(v, i){
+        return { value:v, itemStyle:{ color:colors[i] } }; }),
+      barMaxWidth:18, itemStyle:{ borderColor:INK, borderWidth:1.6 },
+      label:{ show:true, position:'right', fontFamily:F_MONO, fontSize:9.5, color:INK,
+        formatter:function(p){ return fmtPct(p.value, 2); } } }]
+  });
+  document.getElementById('missSub').textContent = t('q_sub', rows.length, rows.length ? fmtPct(vals[0], 2) : '—');
+  document.getElementById('missNote').innerHTML = '<div class="note">' + t('q_note') + '</div>';
+  var worst = rows[0], tot = rows.reduce(function(a, r){ return a + r[1]; }, 0);
+  document.getElementById('qCards').innerHTML =
+    statCard(t('th_miss'), rows.length + ' / ' + COLS.length, t('lbl_valid') + ' ' + (COLS.length - rows.length), rows.length ? 'warn' : 'ok') +
+    statCard('MAX', worst ? fmtPct(worst[1] / N, 2) : '0%', worst ? esc(worst[0]) : '—') +
+    statCard('TOTAL NaNs', fmtInt(tot), fmtPct(tot / (N * COLS.length), 3)) +
+    statCard(t('k_n'), fmtInt(N), t('m_params') + ' ' + COLS.length, 'ink');
+}
+
+/* ---------- 09 ledger ---------- */
+function visibleLedgerRows(){
+  var q = state.ledQuery.toLowerCase();
+  return COLS.filter(function(c){
+    if (state.groupFilter !== '__all__' && c.group !== state.groupFilter) return false;
+    if (q && c.name.toLowerCase().indexOf(q) < 0) return false;
+    return true;
+  }).length;
+}
+function buildLedger(){
+  var q = state.ledQuery.toLowerCase();
+  var rows = COLS.filter(function(c){
+    if (state.groupFilter !== '__all__' && c.group !== state.groupFilter) return false;
+    if (q && c.name.toLowerCase().indexOf(q) < 0) return false;
+    return true;
+  });
+  var key = state.ledSort, dir = state.ledDir;
+  rows = rows.slice().sort(function(a, b){
+    var va, vb;
+    if (key === 'rank'){ va = a.rank; vb = b.rank; }
+    else if (key === 'shap'){ va = a.shap; vb = b.shap; }
+    else if (key === 'name'){ return dir * a.name.localeCompare(b.name); }
+    else if (key === 'group'){ return dir * gname(a.group).localeCompare(gname(b.group)) || a.rank - b.rank; }
+    else if (key === 'kind'){ return dir * a.kind.localeCompare(b.kind) || a.rank - b.rank; }
+    else if (key === 'miss'){ va = STATS[a.name].miss; vb = STATS[b.name].miss; }
+    else if (key === 'center'){ va = isFinite(STATS[a.name].mean) ? STATS[a.name].mean : 0; vb = isFinite(STATS[b.name].mean) ? STATS[b.name].mean : 0; }
+    else if (key === 'spread'){ va = STATS[a.name].std; vb = STATS[b.name].std; }
+    if (va !== va) va = -Infinity; if (vb !== vb) vb = -Infinity;
+    return dir * (va - vb);
+  });
+  var html = rows.map(function(c){
+    var s = STATS[c.name];
+    var center, spread;
+    if (c.kind === 'cat'){
+      var cs = CATSTAT[c.name];
+      center = esc(String(cs.order[0])).slice(0, 16);
+      spread = cs.order.length + ' cls';
+    } else { center = fmtNum(s.mean); spread = fmtNum(s.std); }
+    var selA = c.name === state.A, selB = c.name === state.B;
+    return '<tr data-p="' + esc(c.name) + '" class="' + (selA ? 'selA ' : '') + (selB ? 'selB' : '') + '">' +
+      '<td class="num mono">' + c.rank + '</td>' +
+      '<td><b>' + esc(c.name) + '</b>' + (c.matchup ? ' <span class="tag matchup">M</span>' : '') + '</td>' +
+      '<td>' + esc(gname(c.group)) + '</td>' +
+      '<td><span class="tag ' + c.kind + '">' + c.kind + '</span></td>' +
+      '<td class="num mono">' + fmtNum(c.shap, 4) + '</td>' +
+      '<td class="num mono">' + center + '</td>' +
+      '<td class="num mono">' + spread + '</td>' +
+      '<td class="num mono">' + pctRank(s.miss / N) + '</td>' +
+      '<td><button class="btn sm" data-a="1">α</button> <button class="btn sm teal" data-b="1">β</button></td>' +
+      '</tr>';
+  }).join('');
+  var tbl = document.getElementById('ledgerTbl');
+  tbl.querySelector('tbody').innerHTML = html;
+  tbl.querySelector('tbody').onclick = function(e){
+    var tr = e.target.closest('tr'); if (!tr) return;
+    var nm = tr.dataset.p;
+    if (e.target.dataset.b) setB(nm);
+    else if (e.target.dataset.a) setA(nm);
+    else if (e.shiftKey) setB(nm);
+    else setA(nm);
+  };
+  tbl.querySelector('thead').onclick = function(e){
+    var th = e.target.closest('th'); if (!th) return;
+    var i = Array.prototype.indexOf.call(th.parentNode.children, th);
+    var keys = ['rank','name','group','kind','shap','center','spread','miss',null];
+    if (!keys[i]) return;
+    if (state.ledSort === keys[i]) state.ledDir *= -1; else { state.ledSort = keys[i]; state.ledDir = 1; }
+    buildLedger();
+  };
+  document.getElementById('ledgerSub').textContent = t('led_sub', rows.length);
+  document.getElementById('ledNote').innerHTML = '<div class="note">' + t('led_note') + '</div>';
+}
+function markLedger(){
+  var rows = document.querySelectorAll('#ledgerTbl tbody tr');
+  Array.prototype.forEach.call(rows, function(tr){
+    tr.classList.toggle('selA', tr.dataset.p === state.A);
+    tr.classList.toggle('selB', tr.dataset.p === state.B);
+  });
+}
+
+/* ==========================================================================
+   8. selection plumbing
+   ========================================================================== */
+function fillSelects(){
+  var opts = COLS.map(function(c){
+    return '<option value="' + esc(c.name) + '">' + esc(c.name) + '  ·  ' + c.kind + '  ·  #' + c.rank + '</option>';
+  }).join('');
+  var a = document.getElementById('selA'), b = document.getElementById('selB');
+  a.innerHTML = opts; b.innerHTML = opts;
+  a.value = state.A; b.value = state.B;
+}
+function setA(name){
+  if (!col(name)) return;
+  state.A = name;
+  SORTED[name] = SORTED[name] || null;
+  document.getElementById('selA').value = name;
+  renderSection('s-select');
+  refresh('A');
+  markLedger();
+}
+function setB(name){
+  if (!col(name)) return;
+  state.B = name;
+  document.getElementById('selB').value = name;
+  renderSection('s-select');
+  refresh('B');
+  markLedger();
+}
+function buildGroupChips(){
+  var box = document.getElementById('groupChips');
+  var groups = ['__all__'];
+  COLS.forEach(function(c){ if (groups.indexOf(c.group) < 0) groups.push(c.group); });
+  box.innerHTML = groups.map(function(g){
+    return '<span class="chip' + (state.groupFilter === g ? ' on' : '') + '" data-g="' + esc(g) + '">' +
+      (g === '__all__' ? 'ALL (' + COLS.length + ')' : esc(gname(g))) + '</span>';
+  }).join('');
+  box.onclick = function(e){
+    var c = e.target.closest('.chip'); if (!c) return;
+    state.groupFilter = c.dataset.g;
+    buildGroupChips();
+    if (state.open['s-ledger']) buildLedger();
+    digest('s-ledger');
+  };
+}
+
+/* ==========================================================================
+   9. i18n application
+   ========================================================================== */
+function applyStatic(){
+  document.querySelectorAll('[data-i18n]').forEach(function(n){
+    var v = t(n.dataset.i18n);
+    if (typeof v === 'string') n.innerHTML = v;
+  });
+  document.querySelectorAll('[data-i18n-ph]').forEach(function(n){ n.placeholder = t(n.dataset.i18nPh); });
+  document.querySelectorAll('.card').forEach(function(c){
+    c.querySelector('.card-title').textContent = t('sec_' + SECKEY[c.id]);
+  });
+  document.documentElement.lang = LANG === 'zh' ? 'zh-Hant' : 'en';
+  document.title = LANG === 'zh' ? 'ShotSense · 出手資料探針 2014–15' : 'ShotSense · Shot Data Probe 2014–15';
+  document.getElementById('footLeft').textContent = t('foot', fmtInt(N), META.dateStart, META.dateEnd);
+  document.getElementById('footRight').textContent = t('foot2');
+  document.getElementById('btnKde').textContent = t('btn_kde') + ': ' + t(state.kde ? 'on' : 'off');
+  document.getElementById('btnLogY').textContent = t('btn_logy') + ': ' + t(state.logY ? 'on' : 'off');
+  document.getElementById('btnTrend').textContent = t('btn_trend') + ': ' + t(state.trend ? 'on' : 'off');
+  document.getElementById('btnKde').classList.toggle('on', state.kde);
+  document.getElementById('btnLogY').classList.toggle('on', state.logY);
+  document.getElementById('btnTrend').classList.toggle('on', state.trend);
+  document.getElementById('mxAssoc').classList.toggle('on', state.matrixMode === 'assoc');
+  document.getElementById('mxSpear').classList.toggle('on', state.matrixMode === 'spear');
+  document.querySelectorAll('.langbtn').forEach(function(b){
+    b.classList.toggle('on', b.dataset.lang === LANG);
+  });
+}
+function setLang(l){
+  LANG = l; state.lang = l;
+  try { localStorage.setItem('probe-lang', l); } catch (e) {}
+  window.PROBE_LANG = l;
+  applyStatic();
+  buildGroupChips();
+  SECTIONS.forEach(function(id){ if (state.open[id]) renderSection(id, true); digest(id); });
+}
+
+/* ==========================================================================
+   10. boot
+   ========================================================================== */
+function bootLines(){
+  var lines = DICT[LANG].boot_lines;
+  var i = 0;
+  return function(){ if (i < lines.length) { boot(lines[i]); i++; } };
+}
+var nextLine = bootLines();
+
+function bootChunk(fn){ return new Promise(function(res){ window.setTimeout(function(){ fn(); res(); }, 0); }); }
+
+async function main(){
+  boot(null, 0);
+  var L = 0;
+  function step(msg){ boot(msg || t('boot_lines')[Math.min(L, t('boot_lines').length - 1)]); L++; }
+  await bootChunk(function(){ step(); });
+  var raw;
+  try { raw = decompress(); }
+  catch (e){ document.getElementById('bootLog').innerHTML += '<div style="color:#E63946">' + e.message + '</div>'; throw e; }
+  await bootChunk(function(){ step(); });
+
+  var lines = raw.split('\n');
+  COLS = META.params.slice();
+  N = META.n;
+  await bootChunk(function(){ step(); });
+
+  for (var i = 0; i < COLS.length; i++){
+    var arr = new Float64Array(N);
+    parseLine(lines[i], arr);
+    DATA[COLS[i].name] = arr;
+  }
+  var pidx = new Float64Array(N), made = new Float64Array(N), day = new Float64Array(N);
+  parseLine(lines[COLS.length], pidx);
+  parseLine(lines[COLS.length + 1], made);
+  parseLine(lines[COLS.length + 2], day);
+  PIDX = pidx; MADE = made; DAY = day;
+  raw = null; lines = null;
+  await bootChunk(function(){ step(); });
+
+  for (var c2 = 0; c2 < COLS.length; c2++){
+    var nm = COLS[c2].name;
+    STATS[nm] = accumulate(DATA[nm]);
+    if (COLS[c2].kind === 'cat'){
+      var counts = {}, total = 0, order = [];
+      var catsArr = COLS[c2].cats || [];
+      for (var q2 = 0; q2 < catsArr.length; q2++){ counts[catsArr[q2]] = 0; }
+      for (var r2 = 0; r2 < N; r2++){
+        var v2 = DATA[nm][r2];
+        if (v2 !== v2) continue;
+        var key = catsArr[v2];
+        if (key === undefined) key = String(v2);
+        if (counts[key] === undefined) counts[key] = 0;
+        counts[key]++; total++;
+      }
+      order = Object.keys(counts).sort(function(a, b){ return counts[b] - counts[a]; });
+      CATSTAT[nm] = { counts:counts, order:order, total:total };
+    }
+  }
+  MISSING = COLS.map(function(c){ return [c.name, STATS[c.name].miss, c.kind, c.group]; })
+                .filter(function(r){ return r[1] > 0; })
+                .sort(function(a, b){ return b[1] - a[1]; });
+  await bootChunk(function(){ step(); });
+  await bootChunk(function(){ step(); });
+  await bootChunk(function(){ step(); });
+
+  /* ---------- wire the UI ---------- */
+  state.A = COLS.reduce(function(best, c){ return (!best || c.shap > best.shap) ? c : best; }, null).name;
+  state.B = COLS.filter(function(c){ return c.name !== state.A && c.kind === 'num'; })[0].name;
+  fillSelects();
+
+  document.getElementById('selA').addEventListener('change', function(e){ setA(e.target.value); });
+  document.getElementById('selB').addEventListener('change', function(e){ setB(e.target.value); });
+  document.getElementById('btnSwap').addEventListener('click', function(){
+    var a = state.A; setA(state.B); setB(a);
+  });
+  document.getElementById('btnSame').addEventListener('click', function(){ setB(state.A); });
+  document.getElementById('btnExpand').addEventListener('click', function(){
+    SECTIONS.forEach(function(id){ toggleSection(id, true); });
+  });
+  document.getElementById('btnCollapse').addEventListener('click', function(){
+    SECTIONS.forEach(function(id){ toggleSection(id, id === 's-select'); });
+  });
+  document.getElementById('btnKde').addEventListener('click', function(){ state.kde = !state.kde; applyStatic(); renderDist(); });
+  document.getElementById('btnLogY').addEventListener('click', function(){ state.logY = !state.logY; applyStatic(); renderDist(); });
+  document.getElementById('btnTrend').addEventListener('click', function(){ state.trend = !state.trend; applyStatic(); renderPair(); });
+  document.getElementById('mxAssoc').addEventListener('click', function(){
+    state.matrixMode = 'assoc'; applyStatic(); renderMatrix(); renderRelation(); digest('s-rel');
+  });
+  document.getElementById('mxSpear').addEventListener('click', function(){
+    state.matrixMode = 'spear'; applyStatic(); renderMatrix(); renderRelation(); digest('s-rel');
+  });
+  document.getElementById('ledSearch').addEventListener('input', function(e){
+    state.ledQuery = e.target.value.trim(); buildLedger();
+  });
+  document.querySelectorAll('.card-head').forEach(function(h){
+    h.addEventListener('click', function(){ toggleSection(h.dataset.toggle); });
+  });
+  document.querySelectorAll('.langbtn').forEach(function(b){
+    b.addEventListener('click', function(){ setLang(b.dataset.lang); });
+  });
+  buildGroupChips();
+
+  /* scatter click → inspector is wired by renderSection('s-pair') */
+  applyStatic();
+
+  /* ---------- initial render ---------- */
+  SECTIONS.forEach(function(id){
+    var isOpen = document.getElementById(id).classList.contains('open');
+    state.open[id] = isOpen;
+    if (isOpen) renderSection(id, true);
+    digest(id);
+  });
+  await bootChunk(function(){ step(); });
+
+  window.PROBE_STATS = function(n){
+    var s = STATS[n]; if (!s) return null;
+    var out = { n:s.n, missing:s.miss, mean:s.mean, std:s.std, skew:s.skew,
+                kurt:s.kurt, min:s.min, max:s.max, jb:s.jb, p:s.p };
+    if (isNum(n)){ var so = sortedOf(n); out.median = quantile(so, 0.5); out.q1 = quantile(so, 0.25); out.q3 = quantile(so, 0.75); }
+    else if (CATSTAT[n]){ out.ncat = CATSTAT[n].order.length; out.top = CATSTAT[n].order[0]; out.topN = CATSTAT[n].counts[CATSTAT[n].order[0]]; }
+    return out;
+  };
+  window.PROBE_COLS = function(){ return COLS.map(function(c){ return c.name + ':' + c.kind; }); };
+  window.PROBE_LANG = LANG;
+  window.PROBE_OPEN = Object.keys(state.open).filter(function(k){ return state.open[k]; });
+  window.PROBE_READY = true;
+
+  /* header counters */
+  document.getElementById('mShots').textContent = fmtInt(N);
+  document.getElementById('mPlayers').textContent = fmtInt(META.nPlayers);
+  document.getElementById('mParams').textContent = fmtInt(COLS.length);
+  document.getElementById('mFg').textContent = fmtPct(META.shotMade, 2);
+  document.getElementById('mSpan').textContent = META.dateStart + ' → ' + META.dateEnd;
+  document.getElementById('mPayload').textContent = (META.payloadBytes / 1e6).toFixed(2) + ' MB gz';
+
+  boot(t('boot_ok'), 1);
+  window.setTimeout(function(){ document.getElementById('boot').style.display = 'none'; }, 260);
+}
+
+main().catch(function(e){
+  console.error(e);
+  document.getElementById('bootPct').textContent = DICT[LANG].boot_fail;
+  document.getElementById('bootLog').innerHTML += '<div style="color:#E63946">' + e.message + '</div>';
+});
+</script>
+</body>
+</html>

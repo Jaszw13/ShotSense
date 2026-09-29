@@ -1,0 +1,15 @@
+# macOS
+.DS_Store
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Node (puppeteer-core is installed per-machine, never committed)
+node_modules/
+package-lock.json
+
+# verification screenshots
+/probe-shots/
