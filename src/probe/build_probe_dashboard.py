@@ -6,14 +6,16 @@ ShotSense :: Data Probe builder
 把 2014-15 賽季 58 個 model parameter 打包成單一自帶資料的互動式網頁。
 
 產出：
-  1. outputs/ShotSense_Data_Probe_2014_15.html   —— 單檔、離線可用、含全部 102,992 筆
-  2. data/processed/shotsense_2014_15_58params.csv —— 58 欄位的乾淨 CSV（網頁的資料來源）
+  1. index.html —— 單檔、離線可用、含全部 102,992 筆
+     ＋ 10/11/12 號卡片（EBM vs XGBoost、EBM 形狀篩選、EBM 報告）
+  2. data/shotsense_2014_15_58params.csv —— 58 欄位的乾淨 CSV（網頁的資料來源）
 
 設計：
   - 58 個 parameter 直接取自 outputs/shap_ranking_full.csv 的特徵清單（v4 matchup model）
   - 原始 102,992 × 58 以「每欄一行、逗號分隔」的緊湊格式序列化，gzip + base64 後內嵌
   - 瀏覽器端自行解壓、解析、判定型別、處理缺失、計算統計量 —— 全部即時運算
   - 相關係數矩陣（Spearman ρ / 混合型別關聯強度）在 Python 端以全量資料精確計算後內嵌
+  - EBM 的模型對照／形狀篩選／報告由 src/probe/build_ebm_bundle.py 先收斂成 ebm_bundle.json
 """
 
 from __future__ import annotations
@@ -39,6 +41,7 @@ TEMPLATE = Path(__file__).resolve().parent / "template.html"
 ECHARTS = Path(__file__).resolve().parent / "echarts.min.js"
 FFLATE = Path(__file__).resolve().parent / "fflate.min.js"
 FONTS = Path(__file__).resolve().parent / "fonts.css"
+EBM_BUNDLE = Path(__file__).resolve().parent / "ebm_bundle.json"
 OUT_HTML = ROOT / "index.html"
 OUT_CSV = ROOT / "data" / "shotsense_2014_15_58params.csv"
 
@@ -348,13 +351,21 @@ def main() -> int:
     fonts_css = FONTS.read_text(encoding="utf-8") if FONTS.exists() else ""
     if fonts_css:
         log(f"內嵌字型：{FONTS.name}（{len(fonts_css)/1024:.1f} KB）")
+    if not EBM_BUNDLE.exists():
+        raise RuntimeError(
+            f"缺少 {EBM_BUNDLE.name}；請先執行 src/probe/build_ebm_bundle.py"
+        )
+    ebm_js = EBM_BUNDLE.read_text(encoding="utf-8").replace("<", "\\u003c")
+    log(f"內嵌 EBM bundle：{EBM_BUNDLE.name}（{len(ebm_js)/1024:.1f} KB）")
     html = tpl.replace("/*__FONTS__*/", fonts_css)
     html = html.replace("/*__ECHARTS__*/", ECHARTS.read_text(encoding="utf-8"))
     html = html.replace("/*__FFLATE__*/", FFLATE.read_text(encoding="utf-8"))
     meta_js = json.dumps(meta, ensure_ascii=False, separators=(",", ":")).replace("<", "\\u003c")
     html = html.replace("/*__PROBE_META__*/", meta_js)
+    html = html.replace("/*__EBM_BUNDLE__*/", ebm_js)
     html = html.replace("__PROBE_PAYLOAD__", b64)
-    for token in ("/*__FONTS__*/", "/*__ECHARTS__*/", "/*__FFLATE__*/", "/*__PROBE_META__*/", "__PROBE_PAYLOAD__"):
+    for token in ("/*__FONTS__*/", "/*__ECHARTS__*/", "/*__FFLATE__*/",
+                  "/*__PROBE_META__*/", "/*__EBM_BUNDLE__*/", "__PROBE_PAYLOAD__"):
         if token in html:
             raise RuntimeError(f"模板佔位符未被替換：{token}")
     OUT_HTML.write_text(html, encoding="utf-8")

@@ -217,6 +217,55 @@ table.tbl tbody tr{cursor:pointer}
 .tag.num{background:var(--gold)}
 .tag.matchup{background:var(--amber)}
 
+/* ---------- 10/11/12 EBM cards ---------- */
+.tag.keep{background:var(--teal);color:var(--surface)}
+.tag.drop{background:#F3C9CD}
+.tag.flag{background:var(--amber)}
+.tag.nonlinear{background:var(--red);color:var(--surface)}
+.tag.flat{background:var(--grid)}
+.tag.suspicious{background:var(--amber)}
+.tag.linear{background:var(--teal);color:var(--surface)}
+table.tbl td.best{background:#D9EFE9;font-weight:700}
+table.tbl td.delta{font-weight:700}
+table.tbl td.delta.up{color:#1F7A70}
+table.tbl td.delta.down{color:var(--red)}
+table.tbl tbody tr.keeptag{box-shadow:inset 3px 0 0 var(--teal)}
+table.tbl tbody tr.droptag{box-shadow:inset 3px 0 0 var(--red)}
+table.tbl tbody tr.flagtag{box-shadow:inset 3px 0 0 var(--amber)}
+.mrow{display:flex;align-items:baseline;gap:10px;padding:5px 0;
+  border-bottom:1px dotted #CFC9B4;font-family:var(--mono);font-size:11.5px}
+.mrow .k{color:var(--muted);min-width:96px;font-size:10px;letter-spacing:.1em;text-transform:uppercase}
+.mrow .v{font-weight:700}
+.mrow .n{color:#3C4F6B;font-size:10.5px}
+
+/* ---------- rendered report document ---------- */
+.doc{border:2px solid var(--ink);border-radius:4px;background:var(--paper2);
+  padding:16px 20px;max-height:660px;overflow:auto}
+.doc h2{font-size:22px;margin:20px 0 9px;padding-bottom:6px;border-bottom:2px solid var(--ink)}
+.doc h2:first-child{margin-top:0}
+.doc h3{font-size:17px;margin:16px 0 6px;color:var(--red)}
+.doc h4{font-size:14px;margin:12px 0 5px}
+.doc p{font-family:var(--sans);font-size:13px;line-height:1.72;margin:7px 0}
+.doc ul{margin:7px 0 7px 20px;padding:0}
+.doc li{font-family:var(--sans);font-size:13px;line-height:1.68;margin:3px 0}
+.doc blockquote{margin:9px 0;padding:8px 12px;border-left:3px solid var(--gold);
+  background:#FFF8D8;font-size:12.5px}
+.doc blockquote p{font-size:12.5px;margin:3px 0}
+.doc code{font-family:var(--mono);font-size:11.5px;background:var(--gold);
+  padding:1px 4px;border-radius:2px;border:1px solid var(--ink)}
+.doc pre{font-family:var(--mono);font-size:11px;background:var(--surface);
+  border:2px solid var(--ink);border-radius:4px;padding:10px;overflow:auto;white-space:pre-wrap}
+.doc pre code{background:none;border:0;padding:0}
+.doc table{border-collapse:collapse;width:100%;margin:9px 0;
+  font-family:var(--mono);font-size:11px;font-variant-numeric:tabular-nums}
+.doc th{background:var(--ink);color:var(--surface);font-family:var(--sans);
+  font-size:9.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+  padding:6px 8px;text-align:left;border:1px solid var(--ink)}
+.doc td{padding:5px 8px;border:1px solid var(--grid);vertical-align:top}
+.doc td.num{text-align:right}
+.doc tbody tr:nth-child(even) td{background:#FBF8E4}
+.doc hr{border:0;height:2px;background:var(--ink);opacity:.2;margin:14px 0}
+
 /* ---------- misc ---------- */
 .chips{display:flex;flex-wrap:wrap;gap:6px}
 .chip{font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.06em;
@@ -635,6 +684,164 @@ table.tbl tbody tr{cursor:pointer}
     </div>
   </section>
 
+  <!-- ============================ 10 EBM vs XGBOOST ============================ -->
+  <section class="card" id="s-ebm">
+    <div class="card-head" data-toggle="s-ebm">
+      <span class="card-no">10</span>
+      <div><div class="card-title" data-i18n="sec_ebm"></div>
+           <div class="card-en">EBM vs XGBOOST</div></div>
+      <div class="card-digest" id="dgEbm"></div>
+      <span class="caret">+</span>
+    </div>
+    <div class="card-body">
+      <div class="grid4" id="ebmCards"></div>
+      <div class="panel">
+        <div class="panel-head">
+          <span class="stamp red">[HEAD TO HEAD / SAME TEST SET]</span>
+          <h3 data-i18n="ebm_tbl_title"></h3>
+          <span class="lab" id="ebmTblSub"></span>
+        </div>
+        <div class="tblwrap" style="max-height:320px">
+          <table class="tbl" id="ebmMetrics">
+            <thead><tr>
+              <th data-i18n="th_metric"></th>
+              <th class="num">EBM · 58</th>
+              <th class="num">EBM · 23</th>
+              <th class="num">LR · 23</th>
+              <th class="num">XGB · 58</th>
+              <th class="num" data-i18n="th_gap"></th>
+            </tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <div class="note" id="ebmNote"></div>
+      </div>
+      <div class="panel">
+        <div class="panel-head">
+          <span class="stamp amber">[CALIBRATION / TIME EXTRAPOLATION]</span>
+          <h3 data-i18n="ebm_cal_title"></h3>
+          <span class="lab" id="ebmCalSub"></span>
+        </div>
+        <div class="chart" id="cEbmCal"></div>
+        <div class="note red" id="ebmCalNote"></div>
+      </div>
+      <div class="panel">
+        <div class="panel-head">
+          <span class="stamp plain">[TERM SHIFT / LOGIT DECOMPOSITION]</span>
+          <h3 data-i18n="ebm_shift_title"></h3>
+          <span class="lab" id="ebmShiftSub"></span>
+        </div>
+        <div class="chart" id="cEbmShift"></div>
+        <div class="note" id="ebmShiftNote"></div>
+      </div>
+      <div class="panel">
+        <div class="panel-head">
+          <span class="stamp teal">[FLAT THRESHOLD SENSITIVITY]</span>
+          <h3 data-i18n="ebm_sens_title"></h3>
+          <span class="lab" id="ebmSensSub"></span>
+        </div>
+        <div class="chart short" id="cEbmSens"></div>
+        <div class="note" id="ebmSensNote"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================ 11 SHAPE SCREENING ============================ -->
+  <section class="card" id="s-shapes">
+    <div class="card-head" data-toggle="s-shapes">
+      <span class="card-no">11</span>
+      <div><div class="card-title" data-i18n="sec_shapes"></div>
+           <div class="card-en">SHAPE SCREENING</div></div>
+      <div class="card-digest" id="dgShapes"></div>
+      <span class="caret">+</span>
+    </div>
+    <div class="card-body">
+      <div class="grid4" id="shapeCards"></div>
+      <div class="panel">
+        <div class="panel-head">
+          <span class="stamp red">[58 FEATURES / QUANTITATIVE RULES]</span>
+          <h3 data-i18n="sh_tbl_title"></h3>
+          <input type="text" id="shSearch" data-i18n-ph="sh_search" style="min-width:200px">
+          <span class="lab" id="shSub"></span>
+        </div>
+        <div class="tblwrap" style="max-height:520px">
+          <table class="tbl" id="shapeTbl">
+            <thead><tr>
+              <th data-i18n="th_rank"></th>
+              <th data-i18n="th_name"></th>
+              <th data-i18n="th_shape"></th>
+              <th class="num" data-i18n="th_share"></th>
+              <th class="num" data-i18n="th_amp"></th>
+              <th class="num" data-i18n="th_mono"></th>
+              <th class="num" data-i18n="th_osc"></th>
+              <th data-i18n="th_action"></th>
+            </tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <div class="note" id="shNote"></div>
+      </div>
+      <div class="panel">
+        <div class="panel-head">
+          <span class="stamp amber">[PAIRWISE TERMS]</span>
+          <h3 data-i18n="sh_inter_title"></h3>
+          <span class="lab" id="shInterSub"></span>
+        </div>
+        <div class="chart" id="cEbmInter"></div>
+        <div class="note" id="shInterNote"></div>
+      </div>
+      <div class="panel">
+        <div class="panel-head">
+          <span class="stamp plain">[COLLINEARITY / |ρ| ≥ 0.8]</span>
+          <h3 data-i18n="sh_collin_title"></h3>
+          <span class="lab" id="shCollinSub"></span>
+        </div>
+        <div class="tblwrap" style="max-height:320px">
+          <table class="tbl" id="collinTbl">
+            <thead><tr>
+              <th data-i18n="th_a"></th>
+              <th data-i18n="th_b"></th>
+              <th class="num">Spearman ρ</th>
+              <th data-i18n="th_strength"></th>
+            </tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <div class="note" id="shCollinNote"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================ 12 EBM REPORT ============================ -->
+  <section class="card" id="s-ebmreport">
+    <div class="card-head" data-toggle="s-ebmreport">
+      <span class="card-no">12</span>
+      <div><div class="card-title" data-i18n="sec_ebmreport"></div>
+           <div class="card-en">EBM REPORT</div></div>
+      <div class="card-digest" id="dgEbmReport"></div>
+      <span class="caret">+</span>
+    </div>
+    <div class="card-body">
+      <div class="grid4" id="repCards"></div>
+      <div class="panel">
+        <div class="panel-head">
+          <span class="stamp teal">[EXECUTIVE DIGEST]</span>
+          <h3 data-i18n="rep_digest_title"></h3>
+        </div>
+        <div id="repDigest"></div>
+      </div>
+      <div class="panel">
+        <div class="panel-head">
+          <span class="stamp">[SOURCE DOCUMENT]</span>
+          <h3 data-i18n="rep_doc_title"></h3>
+          <button class="btn sm" id="btnRepRaw" data-i18n="rep_toggle"></button>
+        </div>
+        <div class="doc" id="repDoc"></div>
+        <div class="note" id="repNote"></div>
+      </div>
+    </div>
+  </section>
+
   <div class="footer">
     <span id="footLeft"></span>
     <span id="footRight"></span>
@@ -659,6 +866,7 @@ table.tbl tbody tr{cursor:pointer}
 'use strict';
 
 var META = /*__PROBE_META__*/;
+var EBM = /*__EBM_BUNDLE__*/;
 var PAYLOAD = '__PROBE_PAYLOAD__';
 
 /* ---------- design tokens (mirrored into JS) ---------- */
@@ -762,7 +970,59 @@ var DICT = {
     boot_ok:'就緒', boot_fail:'載入失敗',
     err_fail:'載入失敗，請開啟瀏覽器主控台查看詳情。',
     more:'其餘 %s 個未展開',
-    sel_a:'α = %s', sel_b:'β = %s'
+    sel_a:'α = %s', sel_b:'β = %s',
+
+    /* ---- 10 / 11 / 12 : EBM ---- */
+    sec_ebm:'EBM 對照 XGBoost',
+    sec_shapes:'EBM 形狀篩選',
+    sec_ebmreport:'EBM 技術報告',
+    th_metric:'指標', th_gap:'差距',
+    th_shape:'形狀分類', th_share:'影響力', th_amp:'形狀振幅',
+    th_mono:'單調指數', th_osc:'變號率', th_action:'建議',
+    th_a:'特徵 A', th_b:'特徵 B', th_strength:'強度',
+    mt_auc:'AUC', mt_logloss:'LogLoss', mt_brier:'Brier',
+    mt_accuracy:'Accuracy', mt_f1:'F1', mt_ece:'ECE（10 分位）',
+    act_keep:'保留', act_drop:'剔除', act_flag:'待複核',
+    cls_nonlinear:'非線性', cls_flat:'平坦', cls_suspicious:'可疑震盪', cls_linear:'線性單調',
+    ebm_tbl_title:'四種模型在同一測試集上的表現',
+    ebm_tbl_sub:function(n){return 'Test n = ' + n + ' · 完全相同的時序切分';},
+    ebm_tbl_note:'<b>怎麼讀：</b>四欄模型都跑在同一份時序 Test（後 30%、基準日 2015-01-21）上。EBM · 58 是完整的內在可解釋模型；EBM · 23 是剔除 35 個冗餘／震盪特徵後重訓的版本；LR · 23 是用同一批保留特徵訓練的 Logistic Regression；XGB · 58 是黑盒上界。<b>差距</b>欄是 EBM · 58 減 XGB · 58 —— 綠字代表 EBM 較好（F1 就是這種情況），紅字代表 XGB 較好。AUC 只差 0.0122，但 EBM 的每一個預測都能攤開成一條條 shape function 來讀。',
+    ebm_cal_title:'三個時段的校準診斷',
+    ebm_cal_sub:function(a,b,c){return 'fit ' + a + ' / valid ' + b + ' / test ' + c;},
+    ebm_cal_note:'柱狀圖是 <b>偏差（平均預測 − 實際命中率）</b>，折線是 AUC。EBM 在 Train 與 Valid 上校準良好（偏差 +0.0007 / −0.0040），卻在 Test 上高估了 <b>+0.0755</b>。這不是過擬合，而是<b>時間外推</b>：Test 期的賽程編號落在訓練期沒見過的區間。XGBoost 的樹狀結構把超範圍的值丟進同一個葉節點，外推幅度小得多，所以同樣的特徵沒有在它身上造成偏移。',
+    ebm_shift_title:'Test 偏移的逐項拆解（logit 空間）',
+    ebm_shift_sub:function(n){return '前 ' + n + ' 項';},
+    ebm_shift_note:'把 Test 的整體偏移拆回每一個 EBM 項：比較該項在 Test 與 Train 上的平均貢獻差。<b>season_game_no（賽季第幾場）一項就佔了 58.3%</b> —— 它的 shape function 在訓練範圍之外被外推，於是每一筆 Test 預測都被灌進一段與標籤無關的正向偏移。<b>這正是內在可解釋性勝過事後 SHAP 的地方</b>：SHAP 只把它排在中段名次、看不出危險；EBM 的 shape function 直接把「不可泛化的時間趨勢」畫了出來，篩選規則也已將它判為 Suspicious → Drop。',
+    ebm_sens_title:'Flat 門檻敏感度',
+    ebm_sens_note:'柱狀圖是保留特徵數，折線是下游 Logistic Regression 的 AUC。門檻從 0.001 放寬到 0.03，保留數從 26 掉到 5，但 AUC 幾乎不動（0.6875 → 0.6801）—— 代表被剔除的特徵確實是冗餘的。另需注意 Flat 的兩個判準（影響力佔比、形狀振幅）彼此高度相關（Spearman ρ = 0.75），判定因而穩健。',
+    ebm_k_auc:'EBM AUC（Test）',
+    ebm_k_explain:'可解釋性',
+    ebm_k_explain_n:'ante-hoc · 每個特徵一條 shape function',
+    ebm_k_bias:'Test 校準偏差',
+    ebm_k_feat:'保留特徵數',
+    ebm_k_feat_n:function(k,n){return '剔除 ' + n + ' 個 · 全部 ' + k + ' 個';},
+    sh_tbl_title:'58 個特徵的形狀判定',
+    sh_search:'搜尋特徵名稱…',
+    sh_sub:function(n){return '顯示 ' + n + ' 列';},
+    sh_note:'<b>判定規則（全部由公式決定，非目視）：</b>影響力佔比 &lt; 0.5% 或形狀振幅 &lt; 0.02×模型尺度 → Flat；僅 2 個取值 → Linear；單調指數 ≥ 0.8 且 |ρ| ≥ 0.9 且線性 R² ≥ 0.85 → Linear；變號率 ≥ 0.25 且非單調 → Suspicious；其餘 → Non-linear。震盪類指標計算前先做去噪（|Δy| &lt; 0.005×模型尺度 歸零），避免 EBM 樓梯狀的數值雜訊被誤判為高頻震盪。點任一列可設為 α。',
+    sh_inter_title:'重要性前 10 的兩兩交互項',
+    sh_inter_sub:function(n){return n + ' 項';},
+    sh_inter_note:'EBM 原生可捕捉兩兩交互。第 1 名 <b>is_home &amp; score_margin_at_shot</b> 的影響力（0.2115）甚至超過任何單一主效應 ——「主場」與「比分差」對命中率的影響必須綁在一起看。',
+    sh_collin_title:'高度共線的特徵對（|Spearman ρ| ≥ 0.8）',
+    sh_collin_sub:function(shown,total){return '列出 ' + shown + ' 組 / 共 ' + total + ' 組';},
+    sh_collin_note:'共線的特徵會<b>分攤</b>重要性，使各自的 shape function 被壓平、甚至被誤判為 Flat。解讀時應以「這一組特徵」為單位，而非單看個別曲線。表中配對幾乎都是<b>同一件事的不同編碼</b>（shot_clock 與 shot_clock_filled、loc_y 與 dist_to_baseline、shot_angle_rad 與 shot_angle_deg…）。',
+    rep_digest_title:'這份報告在講什麼',
+    rep_doc_title:'完整報告原文',
+    rep_toggle:'原始 Markdown',
+    rep_note:'上方是 <code>outputs/ebm_feature_report.md</code> 的完整原文（繁體中文），由 <code>src/train_ebm_and_explain.py</code> 自動產生。按右上角按鈕可切換成原始 Markdown。報告引用的圖檔（shape grid、交互熱力圖、共線性矩陣）以 PNG 存於 <code>outputs/ebm_*.png</code>。',
+    rep_k_ver:'報告版本', rep_k_src:'產生腳本', rep_k_data:'資料表',
+    rep_k_split:'時間切分', rep_k_seed:'隨機種子', rep_k_size:'報告長度', rep_k_inter:'交互項',
+    rep_concl:'核心結論',
+    rep_c1:'<b>幾乎一樣準，但完全可解釋。</b>EBM 的 AUC 只比 XGBoost 低 0.0122，F1 反而高 0.0516 —— 用一條條可讀的 shape function 換到這個代價，正是 Decroos et al. / Nori et al. 的核心主張。',
+    rep_c2:'<b>內在可解釋性抓到事後 SHAP 抓不到的東西。</b>SHAP 把 season_game_no 排在中段名次；EBM 的 shape function 直接暴露它在訓練範圍外被外推，佔了 Test 偏移的 58.3%。',
+    rep_c3:'<b>剔除冗餘既修好校準、又幾乎不損辨識力。</b>從 58 個特徵篩到 23 個，Test 偏差與 ECE 都從 0.0755 降到 0.0162，AUC 只掉 0.0041。',
+    rep_c4:'<b>篩選判定對門檻穩健。</b>Flat 門檻在 0.001～0.03 之間移動，下游 AUC 幾乎不動（0.6875 → 0.6801），代表被刪掉的是真冗餘。',
+    rep_warn:'<b>方法學揭露：</b>XGBoost 用時序切出的 valid 做 early stopping；EBM 沒有外部 eval_set 介面，其早停用內部<b>隨機</b>切出的 15%。兩者訓練規模相當、<b>測試集完全相同</b>，評估公平。'
   },
   en:{
     lang_label:'LANGUAGE / 語言',
@@ -854,7 +1114,59 @@ var DICT = {
     boot_ok:'READY', boot_fail:'LOAD FAILED',
     err_fail:'Load failed — open the browser console for details.',
     more:'%s more not shown',
-    sel_a:'α = %s', sel_b:'β = %s'
+    sel_a:'α = %s', sel_b:'β = %s',
+
+    /* ---- 10 / 11 / 12 : EBM ---- */
+    sec_ebm:'EBM vs XGBoost',
+    sec_shapes:'EBM Shape Screening',
+    sec_ebmreport:'EBM Report',
+    th_metric:'METRIC', th_gap:'GAP',
+    th_shape:'SHAPE CLASS', th_share:'IMPORTANCE', th_amp:'AMPLITUDE',
+    th_mono:'MONOTONICITY', th_osc:'SIGN FLIPS', th_action:'ACTION',
+    th_a:'FEATURE A', th_b:'FEATURE B', th_strength:'STRENGTH',
+    mt_auc:'AUC', mt_logloss:'LogLoss', mt_brier:'Brier',
+    mt_accuracy:'Accuracy', mt_f1:'F1', mt_ece:'ECE (10 bins)',
+    act_keep:'Keep', act_drop:'Drop', act_flag:'Review',
+    cls_nonlinear:'Non-linear', cls_flat:'Flat', cls_suspicious:'Suspicious', cls_linear:'Linear (monotonic)',
+    ebm_tbl_title:'Four models on the same test set',
+    ebm_tbl_sub:function(n){return 'Test n = ' + n + ' · identical time split';},
+    ebm_tbl_note:'<b>How to read this:</b> all four columns are evaluated on the same temporal Test split (last 30%, cut-off 2015-01-21). EBM · 58 is the full intrinsically-interpretable model; EBM · 23 is the same model retrained after dropping 35 redundant or oscillating features; LR · 23 is a Logistic Regression on that same kept set; XGB · 58 is the black-box upper bound. The <b>gap</b> column is EBM · 58 minus XGB · 58 — green means EBM wins (which it does on F1), red means XGBoost wins. AUC differs by only 0.0122, yet every EBM prediction can be unfolded into a set of readable shape functions.',
+    ebm_cal_title:'Calibration across the three periods',
+    ebm_cal_sub:function(a,b,c){return 'fit ' + a + ' / valid ' + b + ' / test ' + c;},
+    ebm_cal_note:'Bars are <b>bias (mean prediction − actual hit rate)</b>; the line is AUC. EBM is well calibrated on Train and Valid (bias +0.0007 / −0.0040) yet over-predicts on Test by <b>+0.0755</b>. That is not overfitting — it is <b>temporal extrapolation</b>: the Test period sits in a range of season-game numbers the model never saw. XGBoost’s tree structure funnels out-of-range values into a single leaf, so it extrapolates far less and the same feature does not shift its predictions.',
+    ebm_shift_title:'Decomposing the Test shift term by term (logit space)',
+    ebm_shift_sub:function(n){return 'top ' + n + ' terms';},
+    ebm_shift_note:'The overall Test shift is decomposed back onto each EBM term by comparing its mean contribution on Test versus Train. <b>A single term, season_game_no, accounts for 58.3%</b> — its shape function is extrapolated beyond the training range, injecting a positive, label-independent offset into every Test prediction. <b>This is exactly where intrinsic interpretability beats post-hoc SHAP:</b> SHAP merely ranks that feature mid-table and hides the danger, whereas the EBM shape function draws the non-generalisable time trend directly — and the screening rules already classified it Suspicious → Drop.',
+    ebm_sens_title:'Flat-threshold sensitivity',
+    ebm_sens_note:'Bars are the number of features kept; the line is the downstream Logistic Regression AUC. Moving the Flat threshold from 0.001 to 0.03 cuts the kept set from 26 down to 5 while AUC barely moves (0.6875 → 0.6801) — evidence that what gets removed really is redundant. Note also that the two Flat criteria (importance share and shape amplitude) are strongly correlated with each other (Spearman ρ = 0.75), which makes the decision robust.',
+    ebm_k_auc:'EBM AUC (Test)',
+    ebm_k_explain:'Interpretability',
+    ebm_k_explain_n:'ante-hoc · one shape function per feature',
+    ebm_k_bias:'Test calibration bias',
+    ebm_k_feat:'Features kept',
+    ebm_k_feat_n:function(k,n){return n + ' dropped · ' + k + ' total';},
+    sh_tbl_title:'Shape verdict for all 58 features',
+    sh_search:'Search feature name…',
+    sh_sub:function(n){return n + ' rows shown';},
+    sh_note:'<b>Rules (all decided by formula, never by eye):</b> importance share &lt; 0.5% or shape amplitude &lt; 0.02× model scale → Flat; only 2 distinct values → Linear; monotonicity ≥ 0.8 and |ρ| ≥ 0.9 and linear R² ≥ 0.85 → Linear; sign-flip rate ≥ 0.25 with non-monotone shape → Suspicious; otherwise → Non-linear. Oscillation metrics are denoised first (|Δy| &lt; 0.005× model scale set to zero) so that the EBM’s staircase-like numerical noise is not mistaken for genuine high-frequency wiggle. Click any row to set it as α.',
+    sh_inter_title:'Top 10 pairwise interaction terms',
+    sh_inter_sub:function(n){return n + ' terms';},
+    sh_inter_note:'EBM captures pairwise interactions natively. The top term, <b>is_home &amp; score_margin_at_shot</b>, has more influence (0.2115) than any single main effect — being at home and the score margin must be read together when explaining a shot.',
+    sh_collin_title:'Highly collinear feature pairs (|Spearman ρ| ≥ 0.8)',
+    sh_collin_sub:function(shown,total){return shown + ' shown / ' + total + ' total';},
+    sh_collin_note:'Collinear features <b>share</b> their importance, which flattens their individual shape functions and can even get them misclassified as Flat. Read them as a group, not curve by curve. Nearly every pair listed is <b>two encodings of the same quantity</b> (shot_clock vs shot_clock_filled, loc_y vs dist_to_baseline, shot_angle_rad vs shot_angle_deg, …).',
+    rep_digest_title:'What this report says',
+    rep_doc_title:'Full source document',
+    rep_toggle:'Raw Markdown',
+    rep_note:'Above is the complete source of <code>outputs/ebm_feature_report.md</code> (written in Traditional Chinese), generated automatically by <code>src/train_ebm_and_explain.py</code>. Use the button to switch to the raw Markdown view. The figures it references (shape grids, interaction heat maps, collinearity matrix) are stored as PNGs under <code>outputs/ebm_*.png</code>.',
+    rep_k_ver:'Report version', rep_k_src:'Produced by', rep_k_data:'Data table',
+    rep_k_split:'Time split', rep_k_seed:'Random seed', rep_k_size:'Report length', rep_k_inter:'Interactions',
+    rep_concl:'Key conclusions',
+    rep_c1:'<b>Almost as accurate, but fully interpretable.</b> EBM trails XGBoost by only 0.0122 AUC while beating it by 0.0516 on F1 — that is the trade the Decroos et al. / Nori et al. line of work argues for.',
+    rep_c2:'<b>Intrinsic interpretability caught what post-hoc SHAP missed.</b> SHAP ranks season_game_no mid-table; the EBM shape function exposes that it is being extrapolated beyond its training range, accounting for 58.3% of the Test shift.',
+    rep_c3:'<b>Dropping redundancy fixed calibration at almost no cost in discrimination.</b> Going from 58 features to 23 cut Test bias and ECE from 0.0755 to 0.0162, while AUC fell by just 0.0041.',
+    rep_c4:'<b>The screening verdict is threshold-robust.</b> Sweeping the Flat threshold across 0.001–0.03 barely moves downstream AUC (0.6875 → 0.6801), so what was removed is genuinely redundant.',
+    rep_warn:'<b>Methodological disclosure:</b> XGBoost early-stops on a temporally carved valid split; EBM has no external eval_set hook, so it early-stops on an internal <b>random</b> 15%. Training sizes are comparable and the <b>test set is identical</b>, so the comparison is fair.'
   }
 };
 
@@ -1112,7 +1424,8 @@ window.addEventListener('resize', function(){
    ========================================================================== */
 var state = { A:null, B:null, lang:'zh', open:{}, groupFilter:'__all__',
               kde:true, logY:false, trend:true, matrixMode:'assoc',
-              ledSort:'rank', ledDir:1, ledQuery:'' };
+              ledSort:'rank', ledDir:1, ledQuery:'',
+              shSort:'rank', shDir:1, shQuery:'', repRaw:false };
 
 function col(name){ for (var i = 0; i < COLS.length; i++) if (COLS[i].name === name) return COLS[i]; return null; }
 function isNum(name){ var c = col(name); return c && c.kind === 'num'; }
@@ -1121,17 +1434,21 @@ function pctRank(v){ return fmtPct(v, v < 0.01 ? 3 : 2); }
 /* ==========================================================================
    6. sections & accordion
    ========================================================================== */
-var SECTIONS = ['s-select','s-profile','s-dist','s-qq','s-outlier','s-pair','s-rel','s-matrix','s-quality','s-ledger'];
+var SECTIONS = ['s-select','s-profile','s-dist','s-qq','s-outlier','s-pair','s-rel','s-matrix','s-quality','s-ledger',
+                's-ebm','s-shapes','s-ebmreport'];
 var DEP = {
   's-select':['A','B'], 's-profile':['A'], 's-dist':['A'], 's-qq':['A'], 's-outlier':['A'],
-  's-pair':['A','B'], 's-rel':['A','B'], 's-matrix':[], 's-quality':[], 's-ledger':['A','B']
+  's-pair':['A','B'], 's-rel':['A','B'], 's-matrix':[], 's-quality':[], 's-ledger':['A','B'],
+  's-ebm':[], 's-shapes':[], 's-ebmreport':[]
 };
 var DG = { 's-select':'dgSelect', 's-profile':'dgProfile', 's-dist':'dgDist', 's-qq':'dgQq',
            's-outlier':'dgOut', 's-pair':'dgPair', 's-rel':'dgRel', 's-matrix':'dgMatrix',
-           's-quality':'dgQuality', 's-ledger':'dgLedger' };
+           's-quality':'dgQuality', 's-ledger':'dgLedger',
+           's-ebm':'dgEbm', 's-shapes':'dgShapes', 's-ebmreport':'dgEbmReport' };
 var SECKEY = { 's-select':'select', 's-profile':'profile', 's-dist':'dist', 's-qq':'qq',
                's-outlier':'out', 's-pair':'pair', 's-rel':'rel', 's-matrix':'matrix',
-               's-quality':'quality', 's-ledger':'ledger' };
+               's-quality':'quality', 's-ledger':'ledger',
+               's-ebm':'ebm', 's-shapes':'shapes', 's-ebmreport':'ebmreport' };
 function toggleSection(id, force){
   var el = document.getElementById(id);
   var open = force === undefined ? !el.classList.contains('open') : !!force;
@@ -1153,6 +1470,9 @@ function renderSection(id, force){
     case 's-matrix':  renderMatrix(); break;
     case 's-quality': renderQuality(); break;
     case 's-ledger':  buildLedger(); break;
+    case 's-ebm':     renderEbm(); break;
+    case 's-shapes':  renderShapes(); break;
+    case 's-ebmreport': renderEbmReport(); break;
   }
   if (id === 's-pair') window.setTimeout(wirePair, 0);
 }
@@ -1216,6 +1536,18 @@ function digest(id){
     case 's-matrix':  el.textContent = t('mx_sub', COLS.length); break;
     case 's-quality': el.textContent = t('q_sub', MISSING.length, MISSING.length ? fmtPct(MISSING[0][1] / N) : '—'); break;
     case 's-ledger':  el.textContent = t('led_sub', visibleLedgerRows()); break;
+    case 's-ebm':
+      el.textContent = 'EBM ' + fmtNum(EBM.metrics[0].ebm58, 4) + ' · XGB ' + fmtNum(EBM.metrics[0].xgb58, 4) +
+                       ' · Δ ' + signed(EBM.metrics[0].ebm58 - EBM.metrics[0].xgb58);
+      break;
+    case 's-shapes':
+      el.textContent = t('act_keep') + ' ' + EBM.meta.nKept + ' / ' + t('act_drop') + ' ' + EBM.meta.nDropped +
+                       ' · ' + t('sh_inter_sub', EBM.meta.nInteractions);
+      break;
+    case 's-ebmreport':
+      el.textContent = 'ebm_feature_report.md · ' + (EBM.report.length / 1024).toFixed(1) + ' K · ' +
+                       EBM.meta.nKept + '/' + EBM.meta.nFeatures;
+      break;
   }
 }
 
@@ -2125,6 +2457,464 @@ function markLedger(){
 }
 
 /* ==========================================================================
+   7b. EBM renderers  (cards 10 / 11 / 12)
+   ========================================================================== */
+var CLS_TAG  = { 'Non-linear':'nonlinear', 'Flat':'flat', 'Suspicious':'suspicious', 'Linear(Monotonic)':'linear' };
+var CLS_KEY  = { 'Non-linear':'cls_nonlinear', 'Flat':'cls_flat', 'Suspicious':'cls_suspicious', 'Linear(Monotonic)':'cls_linear' };
+var CLS_ORD  = { 'Non-linear':0, 'Linear(Monotonic)':1, 'Suspicious':2, 'Flat':3 };
+var CLS_STAT = { 'Non-linear':'hi', 'Linear(Monotonic)':'ok', 'Suspicious':'warn', 'Flat':'bad' };
+var ACT_TAG  = { 'Keep':'keep', 'Drop':'drop', 'Flag':'flag' };
+var ACT_KEY  = { 'Keep':'act_keep', 'Drop':'act_drop', 'Flag':'act_flag' };
+var SH_KEYS  = ['rank','feature','cls','share','amp','mono','osc','action'];
+function clsName(c){ return t(CLS_KEY[c] || 'cls_flat'); }
+function actName(a){ return t(ACT_KEY[a] || 'act_drop'); }
+function clsTag(c){ return '<span class="tag ' + (CLS_TAG[c] || 'flat') + '">' + clsName(c) + '</span>'; }
+function actTag(a){ return '<span class="tag ' + (ACT_TAG[a] || 'drop') + '">' + actName(a) + '</span>'; }
+function signed(v, dp){
+  if (v === null || v === undefined || v !== v) return '—';
+  return (v >= 0 ? '+' : '−') + fmtNum(Math.abs(v), dp === undefined ? 4 : dp);
+}
+function numOr(v, dp){ return (v === null || v === undefined || v !== v) ? '—' : fmtNum(v, dp); }
+
+/* ---------- 10 · EBM vs XGBoost ---------- */
+function renderEbm(){
+  var M = EBM.meta;
+  var mAuc = EBM.metrics[0];
+  var tst = EBM.calibration.filter(function(c){ return c.split === 'Test'; })[0] || {};
+  var sBias = EBM.metrics[5].ebm23;
+  document.getElementById('ebmCards').innerHTML =
+    statCard(t('ebm_k_auc'), fmtNum(mAuc.ebm58, 4),
+             'XGBoost ' + fmtNum(mAuc.xgb58, 4) + ' · Δ ' + signed(mAuc.ebm58 - mAuc.xgb58), 'warn') +
+    statCard(t('ebm_k_explain'), '100%', t('ebm_k_explain_n'), 'ok') +
+    statCard(t('ebm_k_bias'), signed(tst.bias), 'EBM · 23 → ' + signed(sBias), 'bad') +
+    statCard(t('ebm_k_feat'), M.nKept + ' / ' + M.nFeatures,
+             t('ebm_k_feat_n', M.nFeatures, M.nDropped), 'ink');
+  renderEbmMetrics();
+  renderEbmCal();
+  renderEbmShift();
+  renderEbmSens();
+  document.getElementById('ebmNote').innerHTML = t('ebm_tbl_note');
+}
+
+function renderEbmMetrics(){
+  var tb = document.querySelector('#ebmMetrics tbody');
+  if (!tb) return;
+  var cols = ['ebm58','ebm23','lr23','xgb58'];
+  tb.innerHTML = EBM.metrics.map(function(m){
+    var best = null;
+    cols.forEach(function(k){
+      var v = m[k];
+      if (v === null || v === undefined) return;
+      if (best === null) { best = v; return; }
+      if (m.dir === 'up' ? v > best : v < best) best = v;
+    });
+    var cells = cols.map(function(k){
+      var v = m[k];
+      if (v === null || v === undefined) return '<td class="num mono">—</td>';
+      var isBest = best !== null && Math.abs(v - best) < 1e-9;
+      return '<td class="num mono' + (isBest ? ' best' : '') + '">' + fmtNum(v, 4) + '</td>';
+    }).join('');
+    var gap = (m.ebm58 !== null && m.xgb58 !== null) ? m.ebm58 - m.xgb58 : null;
+    var gc;
+    if (gap === null) gc = '<td class="num mono">—</td>';
+    else {
+      var good = m.dir === 'up' ? gap > 0 : gap < 0;
+      gc = '<td class="num mono delta ' + (Math.abs(gap) < 1e-9 ? '' : (good ? 'up' : 'down')) + '">' + signed(gap) + '</td>';
+    }
+    return '<tr><td><b>' + t('mt_' + m.key) + '</b></td>' + cells + gc + '</tr>';
+  }).join('');
+  document.getElementById('ebmTblSub').textContent =
+    t('ebm_tbl_sub', fmtInt(EBM.meta.testN));
+}
+
+function renderEbmCal(){
+  var cal = EBM.calibration;
+  if (!cal.length) return;
+  var names = cal.map(function(c){ return c.split; });
+  var bias  = cal.map(function(c){ return +(c.bias * 100).toFixed(4); });
+  var auc   = cal.map(function(c){ return c.auc; });
+  mk('cEbmCal', {
+    title: titleCfg(t('ebm_cal_title'),
+      cal.length === 3 ? t('ebm_cal_sub', fmtInt(cal[0].n), fmtInt(cal[1].n), fmtInt(cal[2].n)) : ''),
+    legend: Object.assign({}, LG, { data:[t('ebm_k_bias') + ' (pp)', 'AUC'] }),
+    grid:{ left:72, right:72, top:70, bottom:36, containLabel:false },
+    tooltip: Object.assign({}, TT, { trigger:'axis', formatter:function(ps){
+      var i = ps[0].dataIndex, c = cal[i];
+      return '<b>' + esc(c.split) + '</b><br>n = ' + fmtInt(c.n) +
+             '<br>bias = ' + signed(c.bias) + '  (' + signed(c.bias * 100, 2) + ' pp)' +
+             '<br>AUC = ' + fmtNum(c.auc, 4) +
+             '<br>ECE = ' + fmtNum(c.ece, 4) +
+             '<br>' + t('k_mean') + ' = ' + fmtNum(c.pred, 4) + ' vs ' + fmtNum(c.actual, 4);
+    } }),
+    xAxis: Object.assign({}, AXC, { type:'category', data:names,
+      axisLabel:{ color:INK, fontFamily:F_MONO, fontSize:11 } }),
+    yAxis: [
+      Object.assign({}, AX, { type:'value', name:'bias (pp)', nameGap:42, nameLocation:'middle', nameRotate:90,
+        nameTextStyle:{ color:MUTED, fontFamily:F_MONO, fontSize:10, align:'center' },
+        axisLabel:{ color:INK, fontFamily:F_MONO, fontSize:10, formatter:function(v){ return v.toFixed(1); } } }),
+      Object.assign({}, AX, { type:'value', name:'AUC', nameGap:48, nameLocation:'middle', nameRotate:90,
+        nameTextStyle:{ color:MUTED, fontFamily:F_MONO, fontSize:10, align:'center' },
+        min: +(Math.min.apply(null, auc) - 0.012).toFixed(4),
+        max: +(Math.max.apply(null, auc) + 0.012).toFixed(4),
+        splitLine:{ show:false },
+        axisLabel:{ color:INK, fontFamily:F_MONO, fontSize:10, formatter:function(v){ return v.toFixed(3); } } })
+    ],
+    series:[
+      { name:t('ebm_k_bias') + ' (pp)', type:'bar', barMaxWidth:54,
+        data: bias.map(function(v){
+          return { value:v, itemStyle:{ color: v > 0 ? RED : TEAL },
+                   label:{ position: v >= 0 ? 'top' : 'bottom' } };
+        }),
+        itemStyle:{ borderColor:INK, borderWidth:2 },
+        label:{ show:true, fontFamily:F_MONO, fontSize:10.5, color:INK,
+          formatter:function(p){ return signed(p.value, 2); } } },
+      { name:'AUC', type:'line', yAxisIndex:1, data:auc,
+        symbol:'rect', symbolSize:9, lineStyle:{ color:INK, width:2 },
+        itemStyle:{ color:GOLD, borderColor:INK, borderWidth:2 },
+        label:{ show:true, position:'bottom', fontFamily:F_MONO, fontSize:10, color:INK,
+          formatter:function(p){ return fmtNum(p.value, 4); } } }
+    ]
+  });
+  document.getElementById('ebmCalNote').innerHTML = t('ebm_cal_note');
+}
+
+function renderEbmShift(){
+  var rows = EBM.shift.slice().sort(function(a, b){ return Math.abs(a.share) - Math.abs(b.share); });
+  if (!rows.length) return;
+  var names = rows.map(function(r){ return r.term; });
+  var vals  = rows.map(function(r){ return +(r.share * 100).toFixed(2); });
+  var vmax  = Math.max.apply(null, vals);
+  fitH('cEbmShift', clamp(rows.length * 30 + 168, 440, 640));
+  mk('cEbmShift', {
+    title: titleCfg(t('ebm_shift_title'), t('ebm_shift_sub', rows.length)),
+    grid:{ left:14, right:84, top:70, bottom:30, containLabel:true },
+    tooltip: Object.assign({}, TT, { formatter:function(p){
+      var r = rows[p.dataIndex];
+      return '<b>' + esc(r.term) + '</b>' +
+             '<br>Train ' + signed(r.train, 5) +
+             '<br>Test  ' + signed(r.test, 5) +
+             '<br>shift ' + signed(r.shift, 5) + ' logits' +
+             '<br><b>' + fmtPct(r.share, 2) + '</b> of total |shift|';
+    } }),
+    xAxis: Object.assign({}, AX, { type:'value', max: +(vmax * 1.20).toFixed(2),
+      axisLabel:{ color:INK, fontFamily:F_MONO, fontSize:10, formatter:function(v){ return v.toFixed(0) + '%'; } } }),
+    yAxis: Object.assign({}, AXC, { type:'category', data:names,
+      axisLabel:{ color:INK, fontFamily:F_MONO, fontSize:10,
+        formatter:function(v){ return v.length > 30 ? v.slice(0, 29) + '…' : v; } } }),
+    series:[{ type:'bar', barMaxWidth:17,
+      data: vals.map(function(v, i){
+        return { value:v, itemStyle:{ color: i === vals.length - 1 ? RED : (v >= 5 ? AMBER : GOLD) } };
+      }),
+      itemStyle:{ borderColor:INK, borderWidth:1.6 },
+      label:{ show:true, position:'right', fontFamily:F_MONO, fontSize:10, color:INK,
+        formatter:function(p){ return fmtNum(p.value, 2) + '%'; } } }]
+  });
+  document.getElementById('ebmShiftSub').textContent = t('ebm_shift_sub', rows.length);
+  document.getElementById('ebmShiftNote').innerHTML = t('ebm_shift_note');
+}
+
+function renderEbmSens(){
+  var s = EBM.sensitivity;
+  if (!s.length) return;
+  var names = s.map(function(r){ return fmtNum(r.threshold, 3); });
+  var kept  = s.map(function(r){ return r.nKept; });
+  var auc   = s.map(function(r){ return r.auc; });
+  mk('cEbmSens', {
+    title: titleCfg(t('ebm_sens_title'), 'Flat < ' + names.join(' / ')),
+    legend: Object.assign({}, LG, { data:[t('ebm_k_feat'), 'LR AUC'] }),
+    grid:{ left:62, right:66, top:64, bottom:34, containLabel:false },
+    tooltip: Object.assign({}, TT, { trigger:'axis', formatter:function(ps){
+      var i = ps[0].dataIndex, r = s[i];
+      return '<b>Flat &lt; ' + fmtNum(r.threshold, 3) + '</b>' +
+             '<br>' + t('ebm_k_feat') + ' = ' + r.nKept +
+             '<br>AUC = ' + fmtNum(r.auc, 4) +
+             '<br>LogLoss = ' + fmtNum(r.logloss, 4) +
+             '<br>Brier = ' + fmtNum(r.brier, 4);
+    } }),
+    xAxis: Object.assign({}, AXC, { type:'category', data:names,
+      axisLabel:{ color:INK, fontFamily:F_MONO, fontSize:10 } }),
+    yAxis: [
+      Object.assign({}, AX, { type:'value', name:t('ebm_k_feat'), nameGap:38, nameLocation:'middle', nameRotate:90,
+        nameTextStyle:{ color:MUTED, fontFamily:F_MONO, fontSize:10, align:'center' },
+        min:0, max: Math.max.apply(null, kept) + 4,
+        axisLabel:{ color:INK, fontFamily:F_MONO, fontSize:10 } }),
+      Object.assign({}, AX, { type:'value', name:'LR AUC', nameGap:44, nameLocation:'middle', nameRotate:90,
+        nameTextStyle:{ color:MUTED, fontFamily:F_MONO, fontSize:10, align:'center' },
+        min: +(Math.min.apply(null, auc) - 0.004).toFixed(4),
+        max: +(Math.max.apply(null, auc) + 0.004).toFixed(4),
+        splitLine:{ show:false },
+        axisLabel:{ color:INK, fontFamily:F_MONO, fontSize:10, formatter:function(v){ return v.toFixed(3); } } })
+    ],
+    series:[
+      { name:t('ebm_k_feat'), type:'bar', barMaxWidth:42,
+        data: kept.map(function(v, i){
+          return { value:v, itemStyle:{ color: i === 1 || i === 2 ? RED : GOLD } };
+        }),
+        itemStyle:{ borderColor:INK, borderWidth:2 },
+        label:{ show:true, position:'top', fontFamily:F_MONO, fontSize:10.5, color:INK } },
+      { name:'LR AUC', type:'line', yAxisIndex:1, data:auc,
+        symbol:'rect', symbolSize:9, lineStyle:{ color:INK, width:2 },
+        itemStyle:{ color:TEAL, borderColor:INK, borderWidth:2 },
+        label:{ show:true, position:'bottom', fontFamily:F_MONO, fontSize:10, color:INK,
+          formatter:function(p){ return fmtNum(p.value, 4); } } }
+    ]
+  });
+  document.getElementById('ebmSensNote').innerHTML = t('ebm_sens_note');
+}
+
+/* ---------- 11 · shape screening ---------- */
+function renderShapes(){
+  var M = EBM.meta;
+  var ordered = EBM.shapeClasses.slice().sort(function(a, b){
+    return (CLS_ORD[a.cls] === undefined ? 9 : CLS_ORD[a.cls]) - (CLS_ORD[b.cls] === undefined ? 9 : CLS_ORD[b.cls]);
+  });
+  document.getElementById('shapeCards').innerHTML = ordered.map(function(c){
+    return statCard(clsName(c.cls), c.n,
+      fmtPct(c.share, 2) + ' · ' + t('act_keep') + ' ' + c.keep, CLS_STAT[c.cls] || '');
+  }).join('');
+  buildShapeTable();
+  renderEbmInter();
+  renderCollin();
+  document.getElementById('shNote').innerHTML = t('sh_note');
+  document.getElementById('shInterNote').innerHTML = t('sh_inter_note');
+  document.getElementById('shCollinNote').innerHTML = t('sh_collin_note');
+  document.getElementById('shCollinSub').textContent =
+    t('sh_collin_sub', EBM.collinearity.length, M.nCollinear);
+}
+
+function buildShapeTable(){
+  var q = (state.shQuery || '').toLowerCase();
+  var rows = EBM.decisions.filter(function(d){
+    if (!q) return true;
+    return d.feature.toLowerCase().indexOf(q) >= 0 ||
+           clsName(d.cls).toLowerCase().indexOf(q) >= 0 ||
+           actName(d.action).toLowerCase().indexOf(q) >= 0;
+  });
+  var key = state.shSort, dir = state.shDir;
+  rows = rows.slice().sort(function(a, b){
+    if (key === 'feature') return dir * a.feature.localeCompare(b.feature);
+    if (key === 'cls')     return dir * (a.cls.localeCompare(b.cls) || a.rank - b.rank);
+    if (key === 'action')  return dir * (a.action.localeCompare(b.action) || a.rank - b.rank);
+    var va, vb;
+    if (key === 'share')      { va = a.share;    vb = b.share; }
+    else if (key === 'amp')   { va = a.stdRatio; vb = b.stdRatio; }
+    else if (key === 'mono')  { va = a.mono;     vb = b.mono; }
+    else if (key === 'osc')   { va = a.osc;      vb = b.osc; }
+    else                      { va = a.rank;     vb = b.rank; }
+    if (va === null || va === undefined || va !== va) va = -Infinity;
+    if (vb === null || vb === undefined || vb !== vb) vb = -Infinity;
+    return dir * (va - vb);
+  });
+  var tb = document.querySelector('#shapeTbl tbody');
+  if (!tb) return;
+  tb.innerHTML = rows.map(function(d){
+    var act = ACT_TAG[d.action] || 'drop';
+    return '<tr data-p="' + esc(d.feature) + '" class="' + act + 'tag' + (d.feature === state.A ? ' selA' : '') + '">' +
+      '<td class="num mono">' + d.rank + '</td>' +
+      '<td><b>' + esc(d.feature) + '</b>' + (d.flag ? ' <span class="tag flag">!</span>' : '') + '</td>' +
+      '<td>' + clsTag(d.cls) + '</td>' +
+      '<td class="num mono">' + fmtNum(d.share, 2) + '%</td>' +
+      '<td class="num mono">' + numOr(d.stdRatio, 3) + '</td>' +
+      '<td class="num mono">' + numOr(d.mono, 2) + '</td>' +
+      '<td class="num mono">' + (d.osc === null || d.osc === undefined ? '—' : fmtPct(d.osc, 1)) + '</td>' +
+      '<td>' + actTag(d.action) + '</td>' +
+      '</tr>';
+  }).join('');
+  tb.onclick = function(e){
+    var tr = e.target.closest('tr');
+    if (tr && tr.dataset.p) setA(tr.dataset.p);
+  };
+  var th = document.querySelector('#shapeTbl thead');
+  if (th && !th.__wired){
+    th.__wired = true;
+    th.onclick = function(e){
+      var cell = e.target.closest('th'); if (!cell) return;
+      var i = Array.prototype.indexOf.call(cell.parentNode.children, cell);
+      var k = SH_KEYS[i]; if (!k) return;
+      if (state.shSort === k) state.shDir *= -1; else { state.shSort = k; state.shDir = 1; }
+      buildShapeTable();
+    };
+  }
+  document.getElementById('shSub').textContent = t('sh_sub', rows.length);
+}
+
+function markShapeTbl(){
+  var rows = document.querySelectorAll('#shapeTbl tbody tr');
+  Array.prototype.forEach.call(rows, function(tr){
+    tr.classList.toggle('selA', tr.dataset.p === state.A);
+  });
+}
+
+function renderEbmInter(){
+  var rows = EBM.interactions.slice().sort(function(a, b){ return a.importance - b.importance; });
+  if (!rows.length) return;
+  var names = rows.map(function(r){ return r.name; });
+  var vals  = rows.map(function(r){ return r.importance; });
+  var vmax  = Math.max.apply(null, vals);
+  fitH('cEbmInter', clamp(rows.length * 32 + 158, 400, 560));
+  mk('cEbmInter', {
+    title: titleCfg(t('sh_inter_title'), t('sh_inter_sub', rows.length)),
+    grid:{ left:14, right:92, top:70, bottom:30, containLabel:true },
+    tooltip: Object.assign({}, TT, { formatter:function(p){
+      var r = rows[p.dataIndex];
+      return '<b>' + esc(r.name) + '</b>' +
+             '<br>importance ' + fmtNum(r.importance, 4) +
+             '<br><b>' + fmtPct(r.share, 2) + '</b> of total' +
+             '<br>' + r.nBins + ' bins';
+    } }),
+    xAxis: Object.assign({}, AX, { type:'value', max: +(vmax * 1.22).toFixed(4) }),
+    yAxis: Object.assign({}, AXC, { type:'category', data:names,
+      axisLabel:{ color:INK, fontFamily:F_MONO, fontSize:10,
+        formatter:function(v){ return v.length > 32 ? v.slice(0, 31) + '…' : v; } } }),
+    series:[{ type:'bar', barMaxWidth:17,
+      data: vals.map(function(v, i){
+        return { value:v, itemStyle:{ color: i === vals.length - 1 ? RED : (v >= 0.05 ? AMBER : GOLD) } };
+      }),
+      itemStyle:{ borderColor:INK, borderWidth:1.6 },
+      label:{ show:true, position:'right', fontFamily:F_MONO, fontSize:10, color:INK,
+        formatter:function(p){ return fmtNum(p.value, 4); } } }]
+  });
+  document.getElementById('shInterSub').textContent = t('sh_inter_sub', rows.length);
+}
+
+function renderCollin(){
+  var tb = document.querySelector('#collinTbl tbody');
+  if (!tb) return;
+  tb.innerHTML = EBM.collinearity.map(function(r){
+    var a = Math.abs(r.rho);
+    var lvl = a >= 0.999 ? t('s_vstrong') : a >= 0.95 ? t('s_strong') : t('s_mod');
+    var col = a >= 0.999 ? RED : a >= 0.95 ? AMBER : GOLD;
+    return '<tr data-p="' + esc(r.a) + '">' +
+      '<td><b>' + esc(r.a) + '</b></td>' +
+      '<td><b>' + esc(r.b) + '</b></td>' +
+      '<td class="num mono">' + (r.rho > 0 ? '+' : '−') + fmtNum(a, 3) + '</td>' +
+      '<td><span class="tag" style="background:' + col + '">' + lvl + '</span></td>' +
+      '</tr>';
+  }).join('');
+  tb.onclick = function(e){
+    var tr = e.target.closest('tr');
+    if (tr && tr.dataset.p) setA(tr.dataset.p);
+  };
+}
+
+/* ---------- 12 · report ---------- */
+function renderEbmReport(){
+  var M = EBM.meta;
+  var mAuc = EBM.metrics[0];
+  var tst = EBM.calibration.filter(function(c){ return c.split === 'Test'; })[0] || {};
+  document.getElementById('repCards').innerHTML =
+    statCard(t('ebm_k_auc'), fmtNum(mAuc.ebm58, 4), 'XGBoost ' + fmtNum(mAuc.xgb58, 4), 'warn') +
+    statCard(t('ebm_k_bias'), signed(tst.bias), 'EBM · 23 → ' + signed(EBM.metrics[5].ebm23), 'bad') +
+    statCard(t('ebm_k_feat'), M.nKept + ' / ' + M.nFeatures,
+             t('ebm_k_feat_n', M.nFeatures, M.nDropped), 'ok') +
+    statCard(t('rep_k_inter'), M.nInteractions,
+             '|ρ| ≥ 0.8 → ' + M.nCollinear, 'hi');
+
+  document.getElementById('repDigest').innerHTML =
+    '<div class="mrow"><span class="k">' + t('rep_k_src') + '</span>' +
+      '<span class="v">src/train_ebm_and_explain.py</span>' +
+      '<span class="n">InterpretML 0.7.8 · ExplainableBoostingClassifier</span></div>' +
+    '<div class="mrow"><span class="k">' + t('rep_k_data') + '</span>' +
+      '<span class="v">shots_master_2014_15_v4_matchup.parquet</span>' +
+      '<span class="n">' + M.nFeatures + ' features · label shot_made</span></div>' +
+    '<div class="mrow"><span class="k">' + t('rep_k_split') + '</span>' +
+      '<span class="v">Train ' + fmtInt(M.trainN) + ' / Test ' + fmtInt(M.testN) + '</span>' +
+      '<span class="n">' + t('rep_k_seed') + ' ' + M.seed + ' · cut-off ' + M.cutoff + '</span></div>' +
+    '<div class="mrow"><span class="k">' + t('rep_k_size') + '</span>' +
+      '<span class="v">' + (EBM.report.length / 1024).toFixed(1) + ' K</span>' +
+      '<span class="n">ebm_feature_report.md</span></div>' +
+    '<div class="hr"></div>' +
+    '<div class="lab lab-ink" style="margin-bottom:8px">' + t('rep_concl') + '</div>' +
+    '<ul style="margin:0 0 12px 20px;padding:0">' +
+      ['rep_c1','rep_c2','rep_c3','rep_c4'].map(function(k){
+        return '<li style="font-family:var(--sans);font-size:13px;line-height:1.72;margin:7px 0">' + t(k) + '</li>';
+      }).join('') +
+    '</ul>' +
+    '<div class="note red" style="margin-top:0">' + t('rep_warn') + '</div>';
+
+  var box = document.getElementById('repDoc');
+  if (!box.__src) box.__src = EBM.report;
+  box.innerHTML = state.repRaw
+    ? '<pre><code>' + esc(box.__src) + '</code></pre>'
+    : mdToHTML(box.__src);
+  document.getElementById('repNote').innerHTML = t('rep_note');
+}
+
+/* ---------- minimal markdown renderer (tables, headings, quotes, lists) ---------- */
+function mdInline(s){
+  return esc(s)
+    .replace(/`([^`]+)`/g, '<code>$1</code>')
+    .replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>');
+}
+function mdSplitRow(ln){
+  return ln.trim().replace(/^\|/, '').replace(/\|$/, '').split('|').map(function(s){ return s.trim(); });
+}
+function mdTable(head, rows, sep){
+  var th = head.map(function(c, i){
+    var right = sep && sep[i] && /-:\s*$/.test(sep[i]);
+    return '<th' + (right ? ' class="num"' : '') + '>' + mdInline(c) + '</th>';
+  }).join('');
+  var tb = rows.map(function(r){
+    return '<tr>' + r.map(function(c, i){
+      var right = sep && sep[i] && /-:\s*$/.test(sep[i]);
+      return '<td' + (right ? ' class="num"' : '') + '>' + mdInline(c) + '</td>';
+    }).join('') + '</tr>';
+  }).join('');
+  return '<table><thead><tr>' + th + '</tr></thead><tbody>' + tb + '</tbody></table>';
+}
+function mdToHTML(src){
+  var lines = String(src).split('\n');
+  var out = [], pbuf = [], i = 0;
+  function flush(){ if (pbuf.length){ out.push('<p>' + mdInline(pbuf.join(' ')) + '</p>'); pbuf.length = 0; } }
+  while (i < lines.length){
+    var ln = lines[i];
+    /* fenced code */
+    if (/^\s*```/.test(ln)){
+      flush(); var code = []; i++;
+      while (i < lines.length && !/^\s*```/.test(lines[i])){ code.push(lines[i]); i++; }
+      i++; out.push('<pre><code>' + esc(code.join('\n')) + '</code></pre>'); continue;
+    }
+    /* table */
+    if (/^\s*\|/.test(ln) && i + 1 < lines.length && /^\s*\|[\s:|-]+\|\s*$/.test(lines[i + 1])){
+      flush();
+      var head = mdSplitRow(ln), sep = mdSplitRow(lines[i + 1]), rows = [];
+      i += 2;
+      while (i < lines.length && /^\s*\|/.test(lines[i])){ rows.push(mdSplitRow(lines[i])); i++; }
+      out.push(mdTable(head, rows, sep)); continue;
+    }
+    /* heading */
+    if (/^#{1,6}\s/.test(ln)){
+      flush();
+      var lvl = ln.match(/^#+/)[0].length;
+      var tag = lvl <= 1 ? 'h2' : lvl === 2 ? 'h3' : 'h4';
+      out.push('<' + tag + '>' + mdInline(ln.replace(/^#+\s*/, '')) + '</' + tag + '>');
+      i++; continue;
+    }
+    /* blockquote */
+    if (/^\s*>\s?/.test(ln)){
+      flush(); var bq = [];
+      while (i < lines.length && /^\s*>\s?/.test(lines[i])){ bq.push(lines[i].replace(/^\s*>\s?/, '')); i++; }
+      out.push('<blockquote>' + mdToHTML(bq.join('\n')) + '</blockquote>'); continue;
+    }
+    /* list */
+    if (/^\s*([-*]|\d+\.)\s+/.test(ln)){
+      flush(); var items = [];
+      while (i < lines.length && /^\s*([-*]|\d+\.)\s+/.test(lines[i])){
+        items.push('<li>' + mdInline(lines[i].replace(/^\s*([-*]|\d+\.)\s+/, '')) + '</li>'); i++;
+      }
+      out.push('<ul>' + items.join('') + '</ul>'); continue;
+    }
+    /* rule */
+    if (/^\s*(-{3,}|\*{3,})\s*$/.test(ln)){ flush(); out.push('<hr>'); i++; continue; }
+    /* blank */
+    if (!ln.trim()){ flush(); i++; continue; }
+    pbuf.push(ln.trim()); i++;
+  }
+  flush();
+  return out.join('\n');
+}
+
+/* ==========================================================================
    8. selection plumbing
    ========================================================================== */
 function fillSelects(){
@@ -2143,6 +2933,7 @@ function setA(name){
   renderSection('s-select');
   refresh('A');
   markLedger();
+  markShapeTbl();
 }
 function setB(name){
   if (!col(name)) return;
@@ -2151,6 +2942,7 @@ function setB(name){
   renderSection('s-select');
   refresh('B');
   markLedger();
+  markShapeTbl();
 }
 function buildGroupChips(){
   var box = document.getElementById('groupChips');
@@ -2191,6 +2983,8 @@ function applyStatic(){
   document.getElementById('btnKde').classList.toggle('on', state.kde);
   document.getElementById('btnLogY').classList.toggle('on', state.logY);
   document.getElementById('btnTrend').classList.toggle('on', state.trend);
+  document.getElementById('btnRepRaw').textContent = t('rep_toggle') + ': ' + t(state.repRaw ? 'on' : 'off');
+  document.getElementById('btnRepRaw').classList.toggle('on', state.repRaw);
   document.getElementById('mxAssoc').classList.toggle('on', state.matrixMode === 'assoc');
   document.getElementById('mxSpear').classList.toggle('on', state.matrixMode === 'spear');
   document.querySelectorAll('.langbtn').forEach(function(b){
@@ -2301,6 +3095,12 @@ async function main(){
   document.getElementById('ledSearch').addEventListener('input', function(e){
     state.ledQuery = e.target.value.trim(); buildLedger();
   });
+  document.getElementById('shSearch').addEventListener('input', function(e){
+    state.shQuery = e.target.value.trim(); buildShapeTable();
+  });
+  document.getElementById('btnRepRaw').addEventListener('click', function(){
+    state.repRaw = !state.repRaw; applyStatic(); renderEbmReport();
+  });
   document.querySelectorAll('.card-head').forEach(function(h){
     h.addEventListener('click', function(){ toggleSection(h.dataset.toggle); });
   });
@@ -2330,6 +3130,22 @@ async function main(){
     return out;
   };
   window.PROBE_COLS = function(){ return COLS.map(function(c){ return c.name + ':' + c.kind; }); };
+  window.PROBE_EBM = function(){
+    return {
+      features: EBM.meta.nFeatures, kept: EBM.meta.nKept, dropped: EBM.meta.nDropped,
+      interactions: EBM.meta.nInteractions, collinear: EBM.meta.nCollinear,
+      aucEbm: EBM.metrics[0].ebm58, aucXgb: EBM.metrics[0].xgb58,
+      testBias: (EBM.calibration.filter(function(c){ return c.split === 'Test'; })[0] || {}).bias,
+      shiftTop: EBM.shift[0] ? EBM.shift[0].term : null,
+      shiftTopShare: EBM.shift[0] ? EBM.shift[0].share : null,
+      shapeRows: document.querySelectorAll('#shapeTbl tbody tr').length,
+      metricRows: document.querySelectorAll('#ebmMetrics tbody tr').length,
+      interRows: EBM.interactions.length,
+      collinRows: document.querySelectorAll('#collinTbl tbody tr').length,
+      reportChars: EBM.report.length,
+      reportRaw: state.repRaw
+    };
+  };
   window.PROBE_LANG = LANG;
   window.PROBE_OPEN = Object.keys(state.open).filter(function(k){ return state.open[k]; });
   window.PROBE_READY = true;

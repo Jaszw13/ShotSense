@@ -1,7 +1,7 @@
 # Keep the 43 MB dataset byte-exact and out of diffs; everything else stays diffable.
 /data/shotsense_2014_15_58params.csv  -text -diff
 
-# The 9.6 MB build artifact: suppress the useless diff, keep the source diffable.
+# The 9.7 MB build artifact: suppress the useless diff, keep the source diffable.
 /index.html  -diff
 
 *.parquet  binary

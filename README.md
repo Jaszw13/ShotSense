@@ -1,7 +1,8 @@
 # ShotSense · Shot Data Probe 2014–15
 
 An **offline, single-file, interactive data explorer** for the 2014–15 NBA shot dataset.
-The whole dashboard — all **102,992 shots × 58 model parameters** — lives inside one 9.6 MB
+The whole dashboard — all **102,992 shots × 58 model parameters**, plus the full
+**Explainable Boosting Machine (EBM) interpretability study** — lives inside one 9.7 MB
 `index.html`. No server, no backend, no sampling: the browser decompresses the embedded
 dataset, infers each column's type, handles missing values and computes every statistic live.
 
@@ -10,13 +11,16 @@ dataset, infers each column's type, handles missing values and computes every st
 > 中文摘要：這是一個**離線單檔**的互動式資料探索網頁，把 2014–15 賽季全部 102,992 筆出手 ×
 > 58 個模型參數內嵌在一個 HTML 裡。瀏覽器端即時解壓、自動判定欄位型別、處理缺失值並計算所有
 > 統計量（沒有抽樣、沒有後端）。支援中／英雙語切換（頁面底部），並以可折疊卡片疊放呈現，
-> 不會一次把所有圖表塞給使用者。
+> 不會一次把所有圖表塞給使用者。除了 00–09 的資料探針，10–12 號卡片另外收錄
+> **EBM 對照 XGBoost 的模型比較**、**58 個特徵的形狀篩選**，以及**完整技術報告原文**。
 
 ---
 
 ## What the dashboard gives you
 
-Ten collapsible cards. Only the first two open by default, so you can scan before you dive in.
+Thirteen collapsible cards. Only the first two open by default, so you can scan before you dive in.
+Cards 00–09 probe the **dataset**; cards 10–12 present the **EBM interpretability study** —
+the model-vs-model comparison, the shape screening, and the full technical report.
 
 | # | Card | What it does |
 |---|---|---|
@@ -30,6 +34,9 @@ Ten collapsible cards. Only the first two open by default, so you can scan befor
 | 07 | **Correlation Matrix** | The full 58 × 58 association matrix on a single consistent metric, computed exactly in Python on all 102,992 rows. Click any cell to set that pair as α / β. A "strongest pairs" table below surfaces column redundancy. |
 | 08 | **Missingness** | Missing-value rate per parameter, severity-coloured, plus totals. |
 | 09 | **Parameter Ledger** | The full 58-row register — sortable, searchable, group-filterable. Click a row to set α, Shift-click to set β. |
+| 10 | **EBM vs XGBoost** | Head-to-head on the identical temporal test split: **EBM (58 feat) · EBM screened (23 feat) · LogisticRegression (23 feat) · XGBoost (58 feat)** across AUC, LogLoss, Brier, Accuracy, F1 and ECE, with best-in-column highlighting and an EBM−XGBoost gap column. Plus the calibration diagnosis (Train/Valid/Test bias vs AUC) that exposes the **+0.0755 Test over-prediction**, the term-by-term logit decomposition showing `season_game_no` alone accounts for **58.3 %** of it, and the Flat-threshold sensitivity sweep. |
+| 11 | **EBM Shape Screening** | The 58-row shape verdict ledger — every feature classified **Non-linear / Linear(monotonic) / Suspicious / Flat** by formula (10 quantitative metrics, no eyeballing), with importance share, shape amplitude, monotonicity index, sign-flip rate and the Keep / Drop / Review action. Sortable and searchable; click a row to set α. Below it: the top-10 pairwise interaction terms and the 32 highly-collinear feature pairs. |
+| 12 | **EBM Report** | Executive digest (key conclusions + methodological disclosure) and the **complete source document** `ebm_feature_report.md` rendered inline — headings, tables, blockquotes and inline code — with a toggle to view the raw Markdown. |
 
 **Interaction:** hover for values, click a scatter point for the full shot record, switch
 parameters and every dependent card re-renders instantly, wheel-zoom and drag-pan on every
@@ -41,18 +48,28 @@ chart, responsive down to 430 px, and a language switcher (`中文 / ENGLISH`) p
 
 ```
 ShotSense/
-├── index.html                                   # the dashboard — 9.6 MB, self-contained
+├── index.html                                   # the dashboard — 9.7 MB, self-contained
 ├── data/
 │   ├── shotsense_2014_15_58params.csv           # 43 MB · 102,992 × 58, the page's data source
 │   └── shots_master_2014_15_v4_matchup.parquet  # 9 MB · upstream table (91 cols) used to build it
 ├── outputs/
-│   └── shap_ranking_full.csv                    # the 58-parameter list + SHAP importance + groups
+│   ├── shap_ranking_full.csv                    # the 58-parameter list + SHAP importance + groups
+│   ├── ebm_feature_report.md                    # EBM technical report (embedded in card 12)
+│   ├── ebm_shape_metrics.csv                    # 10 quantitative shape metrics per feature
+│   ├── ebm_term_importances.csv                 # main effects + 10 pairwise interactions
+│   ├── ebm_term_shift_train_vs_test.csv         # per-term Train→Test shift decomposition
+│   ├── ebm_flat_threshold_sensitivity.csv       # Flat-threshold sweep
+│   ├── ebm_calibration_by_split.csv             # Train / Valid / Test calibration
+│   ├── ebm_kept_features.txt                    # 23 kept
+│   └── ebm_dropped_features.txt                 # 35 dropped, with class + reason
 └── src/probe/
     ├── build_probe_dashboard.py                 # builds index.html + the CSV
+    ├── build_ebm_bundle.py                      # condenses the EBM outputs into ebm_bundle.json
+    ├── ebm_bundle.json                          # 67 KB · everything cards 10–12 need
     ├── template.html                            # the frontend source (design system, charts, i18n)
     ├── fetch_fonts.py                           # downloads + base64-embeds the Google Fonts subsets
     ├── fonts.css                                # 404 KB · 8 embedded woff2 faces
-    ├── verify.js                                # headless verification harness (52 checks)
+    ├── verify.js                                # headless verification harness (75 checks)
     ├── echarts.min.js                           # vendored Apache ECharts 5
     └── fflate.min.js                            # vendored fflate (gzip in the browser)
 ```
@@ -149,12 +166,17 @@ categorical", because that heuristic would misclassify rolling percentages such 
 Requirements: Python 3.10+ with `pandas`, `numpy`, `scipy`.
 
 ```bash
-python src/probe/build_probe_dashboard.py
+python src/probe/build_ebm_bundle.py          # outputs/ebm_*  ->  src/probe/ebm_bundle.json
+python src/probe/build_probe_dashboard.py     # parquet + bundle -> index.html + the CSV
 ```
 
-This reads `data/shots_master_2014_15_v4_matchup.parquet` and `outputs/shap_ranking_full.csv`,
-and writes `index.html` (~9.6 MB) plus `data/shotsense_2014_15_58params.csv` (~43 MB).
-Takes roughly 30–80 s. The build fails loudly if any template placeholder is left unreplaced.
+The first step condenses the eight EBM output files into a single 67 KB `ebm_bundle.json`
+(it also parses the 58-row verdict table straight out of `ebm_feature_report.md`).
+The second reads `data/shots_master_2014_15_v4_matchup.parquet`, `outputs/shap_ranking_full.csv`
+and that bundle, and writes `index.html` (~9.7 MB) plus `data/shotsense_2014_15_58params.csv`
+(~43 MB). Takes roughly 30–80 s. Both steps fail loudly if anything is missing or a template
+placeholder is left unreplaced, and the build is **byte-reproducible** — `gzip.compress` is
+called with `mtime=0`, so re-running it produces an identical `index.html`.
 
 The embedded web fonts are already committed in `src/probe/fonts.css`. To regenerate them:
 
@@ -165,17 +187,61 @@ python src/probe/fetch_fonts.py
 ## Verification
 
 `src/probe/verify.js` drives a real headless Chrome (via `puppeteer-core`) against `index.html`
-and runs **52 assertions** — statistics cross-checked against pandas, real mouse hover and click
+and runs **75 assertions** — statistics cross-checked against pandas, real mouse hover and click
 on chart data points, parameter switching, heat-map cell clicks, bilingual switching, accordion
-expand/collapse, responsive layout at 430 px, and a hard check that no console error or page
-error is emitted.
+expand/collapse, the EBM cards (metric table, calibration/term-shift/sensitivity charts, 58-row
+shape ledger sorting + search, report Markdown rendering and the raw toggle), responsive layout
+at 430 px, and a hard check that no console error or page error is emitted.
 
 ```bash
 npm install puppeteer-core
 NODE_PATH=./node_modules node src/probe/verify.js
 ```
 
-Latest run: **52 / 52 passed · 0 console errors · 0 warnings**, boot in ~0.7 s.
+Latest run: **75 / 75 passed · 0 console errors · 0 warnings**, boot in ~0.7 s.
+
+---
+
+## The EBM study (cards 10–12)
+
+Cards 00–09 probe the raw dataset. Cards 10–12 carry the **Explainable Boosting Machine**
+study — an *intrinsically* interpretable additive GAM (InterpretML, Nori et al. 2019), as
+opposed to post-hoc SHAP approximations of a black box.
+
+> **Name note:** the project's existing "EB" means **Empirical Bayes** (a spatial kernel-smoothed
+> shot-make estimator). **EBM here means Explainable Boosting Machine.** They share no code.
+
+**Head-to-head, identical temporal test split (n = 29,742, cut-off 2015-01-21):**
+
+| Metric | EBM · 58 | EBM · 23 | LR · 23 | XGBoost · 58 | Gap (EBM−XGB) |
+|---|---:|---:|---:|---:|---:|
+| AUC | 0.7069 | 0.7028 | 0.6875 | **0.7191** | −0.0122 |
+| LogLoss | 0.6260 | 0.6127 | 0.6245 | **0.6011** | +0.0249 |
+| Brier | 0.2183 | 0.2129 | 0.2178 | **0.2078** | +0.0105 |
+| Accuracy | 0.6518 | — | 0.6522 | **0.6711** | −0.0193 |
+| F1 | **0.6094** | — | — | 0.5578 | +0.0516 |
+| ECE (10 bins) | 0.0755 | 0.0162 | — | **0.0047** | +0.0708 |
+
+**Almost as accurate, but fully interpretable** — and it wins on F1.
+
+**What intrinsic interpretability caught that SHAP did not.** EBM calibrates well on Train and
+Valid (bias +0.0007 / −0.0040) but over-predicts on Test by **+0.0755**. Decomposing that shift
+term by term in logit space shows **`season_game_no` alone accounts for 58.3 %** — its shape
+function is extrapolated past its training range, injecting a label-independent positive offset
+into every Test prediction. SHAP merely ranks that feature mid-table and hides the hazard; the
+shape function draws the non-generalisable trend directly, and the screening rules already
+flagged it `Suspicious → Drop`. Retraining on the 23 kept features cuts the Test bias and ECE
+from 0.0755 to **0.0162** while AUC falls by only 0.0041.
+
+**Screening.** All 58 features are classified by formula (ten quantitative shape metrics —
+monotonicity index, Spearman ρ, linear R², curvature, roughness, sign-flip rate, amplitude … —
+with oscillation metrics denoised first so the EBM's staircase steps are not mistaken for
+genuine wiggle): **17 Non-linear · 4 Linear(monotonic) · 8 Suspicious · 29 Flat**, yielding
+**23 kept / 35 dropped**. Sweeping the Flat threshold from 0.001 to 0.03 moves downstream AUC
+by less than 0.008, so the verdict is threshold-robust.
+
+The complete report is embedded in card 12 and also committed as
+[`outputs/ebm_feature_report.md`](outputs/ebm_feature_report.md).
 
 ---
 

@@ -116,7 +116,7 @@ async function pointIn(page, chartId, seriesIdx, dataIdx) {
   console.log('  header  : ' + struct.header);
   console.log('  langbar : ' + struct.langbar + '   lang=' + struct.lang);
   console.log('  bodyBg  : ' + struct.bodyBg + '   noGradient=' + struct.noNeon);
-  check('10 accordion cards present', struct.cards.length === 10, struct.cards.length + ' cards');
+  check('13 accordion cards present', struct.cards.length === 13, struct.cards.length + ' cards');
   check('default: only 00+01 open', struct.open.length === 2 && struct.open.includes('s-select') && struct.open.includes('s-profile'),
     JSON.stringify(struct.open));
   check('language bar exists', struct.langbar === true);
@@ -131,7 +131,7 @@ async function pointIn(page, chartId, seriesIdx, dataIdx) {
   check('rubber stamps are not collapsed', struct.stampWidths.every(w => w > 60), JSON.stringify(struct.stampWidths));
   check('toolbar buttons are not collapsed', struct.btnWidths.every(b => Number(b.split('=')[1]) > 45),
     struct.btnWidths.join(' '));
-  check('all 10 card titles have text', struct.cardTitles.every(x => x.trim().length > 0),
+  check('all 13 card titles have text', struct.cardTitles.every(x => x.trim().length > 0),
     struct.cardTitles.filter(x => !x.trim()).length + ' empty');
 
   /* ---------- 3. fonts actually applied ---------- */
@@ -513,12 +513,188 @@ async function pointIn(page, chartId, seriesIdx, dataIdx) {
     enChart.distSub + ' | ' + enChart.boxSub);
   check('panel header translated', /Distribution/.test(enChart.panelH3), enChart.panelH3);
 
+  /* ---------- 13b. EBM cards (10 / 11 / 12) ---------- */
+  await page.evaluate(() => {
+    ['s-ebm', 's-shapes', 's-ebmreport'].forEach(id =>
+      document.querySelector('.card-head[data-toggle="' + id + '"]').click());
+  });
+  await sleep(3400);
+
+  const ebm = await page.evaluate(() => {
+    const m = window.PROBE_EBM();
+    const cCal = echarts.getInstanceByDom(document.getElementById('cEbmCal'));
+    const cShift = echarts.getInstanceByDom(document.getElementById('cEbmShift'));
+    const cSens = echarts.getInstanceByDom(document.getElementById('cEbmSens'));
+    const cInter = echarts.getInstanceByDom(document.getElementById('cEbmInter'));
+    const doc = document.getElementById('repDoc');
+    return Object.assign(m, {
+      calSeries: cCal ? cCal.getOption().series.map(s => s.type + '(' + s.data.length + ')') : null,
+      shiftSeries: cShift ? cShift.getOption().series.map(s => s.type + '(' + s.data.length + ')') : null,
+      shiftBars: cShift ? cShift.getOption().series[0].data.length : 0,
+      shiftFirstBar: cShift ? cShift.getOption().series[0].data.slice(-1)[0].value : null,
+      sensSeries: cSens ? cSens.getOption().series.map(s => s.type + '(' + s.data.length + ')') : null,
+      interBars: cInter ? cInter.getOption().series[0].data.length : 0,
+      docH2: doc.querySelectorAll('h2').length,
+      docH3: doc.querySelectorAll('h3').length,
+      docTables: doc.querySelectorAll('table').length,
+      docChars: doc.innerText.length,
+      digest: document.getElementById('dgEbm').textContent.trim(),
+      shapeDigest: document.getElementById('dgShapes').textContent.trim(),
+      reportDigest: document.getElementById('dgEbmReport').textContent.trim(),
+      metricHeader: Array.prototype.map.call(document.querySelectorAll('#ebmMetrics thead th'), x => x.textContent),
+      metricRows: Array.prototype.map.call(document.querySelectorAll('#ebmMetrics tbody tr'),
+        tr => Array.prototype.map.call(tr.children, td => td.textContent.trim()).join(' | ')),
+      shapeCards: Array.prototype.map.call(document.querySelectorAll('#shapeCards .stat'),
+        d => d.querySelector('.k').textContent + '=' + d.querySelector('.v').textContent),
+      ebmCards: Array.prototype.map.call(document.querySelectorAll('#ebmCards .stat'),
+        d => d.querySelector('.k').textContent + '=' + d.querySelector('.v').textContent),
+      repCards: Array.prototype.map.call(document.querySelectorAll('#repCards .stat'),
+        d => d.querySelector('.k').textContent + '=' + d.querySelector('.v').textContent),
+      bestCells: Array.prototype.map.call(document.querySelectorAll('#ebmMetrics td.best'),
+        d => d.textContent.trim()),
+      rawBtn: document.getElementById('btnRepRaw').textContent
+    });
+  });
+  console.log('\n--- EBM (cards 10 / 11 / 12) ---');
+  console.log('  digest      : ' + ebm.digest + '   |   ' + ebm.shapeDigest + '   |   ' + ebm.reportDigest);
+  console.log('  metricHead  : ' + ebm.metricHeader.join(' | '));
+  ebm.metricRows.forEach(r => console.log('   - ' + r));
+  console.log('  ebmCards    : ' + ebm.ebmCards.join('  ·  '));
+  console.log('  shapeCards  : ' + ebm.shapeCards.join('  ·  '));
+  console.log('  repCards    : ' + ebm.repCards.join('  ·  '));
+  console.log('  charts      : cal=' + JSON.stringify(ebm.calSeries) + ' shift=' + ebm.shiftBars +
+    ' sens=' + JSON.stringify(ebm.sensSeries) + ' inter=' + ebm.interBars);
+  console.log('  report doc  : h2=' + ebm.docH2 + ' h3=' + ebm.docH3 + ' tables=' + ebm.docTables +
+    ' chars=' + ebm.docChars);
+  check('EBM bundle carries all 58 features', ebm.features === 58, String(ebm.features));
+  check('screening verdict is 23 kept / 35 dropped', ebm.kept === 23 && ebm.dropped === 35,
+    ebm.kept + ' kept / ' + ebm.dropped + ' dropped');
+  check('head-to-head table lists all six metrics', ebm.metricRows.length === 6, String(ebm.metricRows.length));
+  check('EBM AUC 0.7069 vs XGBoost 0.7191',
+    Math.abs(ebm.aucEbm - 0.7069) < 1e-9 && Math.abs(ebm.aucXgb - 0.7191) < 1e-9,
+    ebm.aucEbm + ' vs ' + ebm.aucXgb);
+  check('Test calibration bias is +0.0755', Math.abs(ebm.testBias - 0.07548771706815727) < 1e-9,
+    String(ebm.testBias));
+  check('top shift term is season_game_no at 58.3%',
+    ebm.shiftTop === 'season_game_no' && Math.abs(ebm.shiftTopShare - 0.5830063322416529) < 1e-9,
+    ebm.shiftTop + ' @ ' + ebm.shiftTopShare);
+  check('best-in-column cells highlighted', ebm.bestCells.length >= 5, JSON.stringify(ebm.bestCells));
+  check('calibration chart is bar(3) + line(3)',
+    /bar\(3\)/.test(ebm.calSeries.join(',')) && /line\(3\)/.test(ebm.calSeries.join(',')),
+    JSON.stringify(ebm.calSeries));
+  check('term-shift chart drawn with 14 bars', ebm.shiftBars === 14, String(ebm.shiftBars));
+  check('sensitivity chart is bar(6) + line(6)',
+    /bar\(6\)/.test(ebm.sensSeries.join(',')) && /line\(6\)/.test(ebm.sensSeries.join(',')),
+    JSON.stringify(ebm.sensSeries));
+  check('interaction chart drawn with 10 bars', ebm.interBars === 10, String(ebm.interBars));
+  check('shape ledger renders 58 rows', ebm.shapeRows === 58, String(ebm.shapeRows));
+  check('collinearity table renders 20 rows', ebm.collinRows === 20, String(ebm.collinRows));
+  check('four shape-class summary cards', ebm.shapeCards.length === 4, JSON.stringify(ebm.shapeCards));
+  check('report rendered with headings and tables',
+    ebm.docH2 >= 1 && ebm.docH3 >= 8 && ebm.docTables >= 6,
+    'h2=' + ebm.docH2 + ' h3=' + ebm.docH3 + ' tables=' + ebm.docTables);
+  check('all three new card digests populated',
+    ebm.digest.length > 10 && ebm.shapeDigest.length > 10 && ebm.reportDigest.length > 10,
+    [ebm.digest, ebm.shapeDigest, ebm.reportDigest].join(' | '));
+  check('EBM card labels translated to English',
+    /Interpretability|AUC/.test(ebm.ebmCards.join(' ')) && !/可解釋|保留特徵/.test(ebm.ebmCards.join(' ')),
+    ebm.ebmCards.join(' | '));
+  await page.screenshot({ path: OUT + '/14b-ebm.png' });
+  await page.evaluate(() => document.getElementById('cEbmShift').scrollIntoView({ block: 'center', behavior: 'instant' }));
+  await sleep(600);
+  await page.screenshot({ path: OUT + '/14c-ebm-shift.png' });
+  await page.evaluate(() => document.getElementById('repDoc').scrollIntoView({ block: 'center', behavior: 'instant' }));
+  await sleep(600);
+  await page.screenshot({ path: OUT + '/14d-ebm-report.png' });
+
+  /* search box filters the shape ledger */
+  await page.evaluate(() => {
+    const s = document.getElementById('shSearch');
+    s.value = 'shot'; s.dispatchEvent(new Event('input', { bubbles: true }));
+  });
+  await sleep(600);
+  const shFiltered = await page.evaluate(() => document.querySelectorAll('#shapeTbl tbody tr').length);
+  console.log('  search "shot" -> ' + shFiltered + ' / 58 rows');
+  check('shape-ledger search filters rows', shFiltered > 0 && shFiltered < 58, String(shFiltered));
+  await page.evaluate(() => {
+    const s = document.getElementById('shSearch');
+    s.value = ''; s.dispatchEvent(new Event('input', { bubbles: true }));
+  });
+  await sleep(500);
+
+  /* header sort */
+  await page.evaluate(() => document.querySelectorAll('#shapeTbl thead th')[3].click());
+  await sleep(600);
+  const sorted = await page.evaluate(() => {
+    const td = document.querySelectorAll('#shapeTbl tbody tr:first-child td');
+    return { name: td[1].textContent.trim(), share: td[3].textContent.trim(), action: td[7].textContent.trim() };
+  });
+  console.log('  sort by importance asc -> ' + JSON.stringify(sorted));
+  check('shape-ledger header sort works (ascending importance)', /0\.03%/.test(sorted.share),
+    JSON.stringify(sorted));
+  await page.evaluate(() => document.querySelectorAll('#shapeTbl thead th')[0].click());
+  await sleep(500);
+
+  /* click a shape row -> becomes alpha */
+  await page.evaluate(() => document.querySelectorAll('#shapeTbl tbody tr')[3].click());
+  await sleep(900);
+  const rowPick = await page.evaluate(() => ({
+    alpha: window.PROBE_STATS && document.getElementById('tA').textContent,
+    marked: document.querySelectorAll('#shapeTbl tbody tr.selA').length,
+    header: document.getElementById('mShots').textContent
+  }));
+  console.log('  click shape row -> ' + JSON.stringify(rowPick));
+  check('clicking a shape row sets α', rowPick.alpha && rowPick.alpha.length > 0 && rowPick.marked === 1,
+    JSON.stringify(rowPick));
+
+  /* raw-markdown toggle */
+  await page.evaluate(() => document.getElementById('btnRepRaw').click());
+  await sleep(900);
+  const raw = await page.evaluate(() => ({
+    flag: window.PROBE_EBM().reportRaw,
+    hasPre: !!document.querySelector('#repDoc pre code'),
+    btn: document.getElementById('btnRepRaw').textContent,
+    len: document.querySelector('#repDoc pre') ? document.querySelector('#repDoc pre').innerText.length : 0
+  }));
+  console.log('  raw toggle on  -> ' + JSON.stringify(raw));
+  check('raw-Markdown toggle shows the source', raw.flag === true && raw.hasPre && raw.len > 8000,
+    JSON.stringify(raw));
+  await page.evaluate(() => document.getElementById('btnRepRaw').click());
+  await sleep(900);
+  const backRendered = await page.evaluate(() => ({
+    flag: window.PROBE_EBM().reportRaw,
+    tables: document.querySelectorAll('#repDoc table').length
+  }));
+  console.log('  raw toggle off -> ' + JSON.stringify(backRendered));
+  check('toggling back re-renders the markdown', backRendered.flag === false && backRendered.tables >= 6,
+    JSON.stringify(backRendered));
+
+  /* language switch must re-render the EBM cards */
+  await page.evaluate(() => document.querySelector('.langbtn[data-lang="zh"]').click());
+  await sleep(2200);
+  const ebmZh = await page.evaluate(() => ({
+    cards: Array.prototype.map.call(document.querySelectorAll('#ebmCards .stat'),
+      d => d.querySelector('.k').textContent).join(' | '),
+    shapeHead: Array.prototype.map.call(document.querySelectorAll('#shapeTbl thead th'),
+      x => x.textContent).join(' | '),
+    actions: Array.prototype.map.call(document.querySelectorAll('#shapeTbl tbody tr:nth-child(-n+3) td:last-child'),
+      x => x.textContent.trim()).join(' | '),
+    repBtn: document.getElementById('btnRepRaw').textContent
+  }));
+  console.log('  ZH EBM: ' + JSON.stringify(ebmZh));
+  check('EBM cards switch to Chinese',
+    /可解釋性/.test(ebmZh.cards) && /形狀分類/.test(ebmZh.shapeHead) && /保留|剔除|待複核/.test(ebmZh.actions),
+    ebmZh.cards + ' || ' + ebmZh.actions);
+  await page.screenshot({ path: OUT + '/14e-ebm-zh.png' });
+  await page.evaluate(() => document.querySelector('.langbtn[data-lang="en"]').click());
+  await sleep(1800);
+
   /* ---------- 14. expand / collapse all ---------- */
   await page.evaluate(() => document.getElementById('btnExpand').click());
   await sleep(4500);
   const allOpen = await page.evaluate(() => document.querySelectorAll('.card.open').length);
   console.log('\n  expand-all -> ' + allOpen + ' cards open');
-  check('expand-all opens every card', allOpen === 10, allOpen + '/10');
+  check('expand-all opens every card', allOpen === 13, allOpen + '/13');
   await page.screenshot({ path: OUT + '/15-expanded-top.png' });
   await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight * 0.42));
   await sleep(900);
